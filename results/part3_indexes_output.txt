@@ -7,10 +7,47 @@
 ========================================================
 Крок 1. explain() БЕЗ індексів
 ========================================================
+>>> ЗАПИТ: A: genre='pop' AND popularity>=70 (sort popularity desc)
+db.tracks.find(
+{
+  track_genre: 'pop',
+  popularity: {
+    '$gte': 70
+  }
+}
+).sort(
+{
+  popularity: -1
+}
+).explain("executionStats")
+
+>>> ЗАПИТ: B: artists='Bad Bunny' (multikey)
+db.tracks.find(
+{
+  artists: 'Bad Bunny'
+}
+).sort(
+{}
+).explain("executionStats")
+
+>>> ЗАПИТ: C: energy>0.9 AND danceability>0.8 (вкладені поля)
+db.tracks.find(
+{
+  'audio_features.energy': {
+    '$gt': 0.9
+  },
+  'audio_features.danceability': {
+    '$gt': 0.8
+  }
+}
+).sort(
+{}
+).explain("executionStats")
+
 {
   label: "A: genre='pop' AND popularity>=70 (sort popularity desc)",
   scan: 'COLLSCAN',
-  executionTimeMillis: 81,
+  executionTimeMillis: 71,
   totalKeysExamined: 0,
   totalDocsExamined: 113999,
   nReturned: 317
@@ -18,7 +55,7 @@
 {
   label: "B: artists='Bad Bunny' (multikey)",
   scan: 'COLLSCAN',
-  executionTimeMillis: 89,
+  executionTimeMillis: 83,
   totalKeysExamined: 0,
   totalDocsExamined: 113999,
   nReturned: 416
@@ -26,7 +63,7 @@
 {
   label: 'C: energy>0.9 AND danceability>0.8 (вкладені поля)',
   scan: 'COLLSCAN',
-  executionTimeMillis: 88,
+  executionTimeMillis: 80,
   totalKeysExamined: 0,
   totalDocsExamined: 113999,
   nReturned: 427
@@ -35,9 +72,12 @@
 ========================================================
 Крок 2. Створення індексів
 ========================================================
-createIndex {"track_genre":1,"popularity":-1} → idx_genre_popularity
-createIndex {"artists":1} → idx_artists_multikey
-createIndex {"audio_features.energy":1,"audio_features.danceability":1} → idx_energy_danceability
+>>> ЗАПИТ: db.tracks.createIndex({"track_genre":1,"popularity":-1}, { name: "idx_genre_popularity" })
+Створено: idx_genre_popularity
+>>> ЗАПИТ: db.tracks.createIndex({"artists":1}, { name: "idx_artists_multikey" })
+Створено: idx_artists_multikey
+>>> ЗАПИТ: db.tracks.createIndex({"audio_features.energy":1,"audio_features.danceability":1}, { name: "idx_energy_danceability" })
+Створено: idx_energy_danceability
 [
   {
     name: '_id_',
@@ -100,21 +140,21 @@ createIndex {"audio_features.energy":1,"audio_features.danceability":1} → idx_
 ========================================================
 A: genre='pop' AND popularity>=70 (sort popularity desc)
   scan:          COLLSCAN  →  IXSCAN
-  час (мс):      81  →  1
+  час (мс):      71  →  1
   docsExamined:  113999  →  317
   keysExamined:  0  →  317
   nReturned:     317  →  317
 
 B: artists='Bad Bunny' (multikey)
   scan:          COLLSCAN  →  IXSCAN
-  час (мс):      89  →  2
+  час (мс):      83  →  2
   docsExamined:  113999  →  416
   keysExamined:  0  →  416
   nReturned:     416  →  416
 
 C: energy>0.9 AND danceability>0.8 (вкладені поля)
   scan:          COLLSCAN  →  IXSCAN
-  час (мс):      88  →  4
+  час (мс):      80  →  4
   docsExamined:  113999  →  427
   keysExamined:  0  →  527
   nReturned:     427  →  427

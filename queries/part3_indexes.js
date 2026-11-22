@@ -70,6 +70,15 @@ print("Індекси tracks: " + JSON.stringify(db.tracks.getIndexes().map(i =>
 // Крок 1. Заміри БЕЗ індексів (очікуємо COLLSCAN)
 // --------------------------------------------------------
 header("Крок 1. explain() БЕЗ індексів");
+cases.forEach(c => {
+  print(">>> ЗАПИТ: " + c.label);
+  print("db.tracks.find(");
+  printjson(c.filter);
+  print(").sort(");
+  printjson(c.sort);
+  print(").explain(\"executionStats\")");
+  print("");
+});
 const before = cases.map(c => profile(c.filter, c.sort, c.label));
 before.forEach(r => printjson(r));
 
@@ -78,7 +87,8 @@ before.forEach(r => printjson(r));
 // --------------------------------------------------------
 header("Крок 2. Створення індексів");
 cases.forEach(c => {
-  print("createIndex " + JSON.stringify(c.index) + " → " + db.tracks.createIndex(c.index, { name: c.indexName }));
+  print(">>> ЗАПИТ: db.tracks.createIndex(" + JSON.stringify(c.index) + ", { name: \"" + c.indexName + "\" })");
+  print("Створено: " + db.tracks.createIndex(c.index, { name: c.indexName }));
 });
 printjson(db.tracks.getIndexes().map(i => ({ name: i.name, key: i.key })));
 

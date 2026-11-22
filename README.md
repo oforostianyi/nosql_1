@@ -17,7 +17,7 @@
 │   ├── part3_analytics.js      # аналітичні пайплайни частини 3
 │   └── part3_indexes.js        # індекси + explain() частини 3
 ├── results/                    # збережений вивід усіх скриптів (замість скріншотів)
-│   ├── part2_output.txt
+│   ├── part2_output.txt        # повний запит + результат для кожного пункту
 │   ├── part3_analytics_output.txt
 │   └── part3_indexes_output.txt
 └── README.md
@@ -116,11 +116,11 @@ mongosh "$MONGO_URI" --file queries/part3_indexes.js
 | Сольні / колаборації | `{artists: {$size: 1}}`, `$expr: {$gte: [{$size: "$artists"}, 3]}` | підрахунок роздільників у `$expr` |
 | Аналітика по виконавцях | `$unwind: "$artists"` → `$group` | попередній `$split` у кожному пайплайні |
 
-Практичний ефект підтверджено у `part3_indexes.js`: запит `{artists: "Bad Bunny"}` з multikey-індексом виконується за **2 мс проти 89 мс** і читає **416 документів замість 113 999**.
+Практичний ефект підтверджено у `part3_indexes.js`: запит `{artists: "Bad Bunny"}` з multikey-індексом виконується за **2 мс проти 83 мс** і читає **416 документів замість 113 999**.
 
 ## Частина 2 — Запити (`queries/part2_queries.js`)
 
-Повний вивід: `results/part2_output.txt`.
+Повний вивід: `results/part2_output.txt` — для кожного пункту надруковано **повний запит** (`db.tracks.find(filter, projection).sort(...).limit(...)`) і одразу результат.
 
 | # | Запит | Оператори | Результат |
 |---|---|---|---|
@@ -136,7 +136,7 @@ mongosh "$MONGO_URI" --file queries/part3_indexes.js
 
 ## Частина 3 — Аналітика (`queries/part3_analytics.js`)
 
-Повний вивід: `results/part3_analytics_output.txt`.
+Повний вивід: `results/part3_analytics_output.txt` — кожен пайплайн надруковано **повністю** (`db.tracks.aggregate([...])`) перед результатом.
 
 **3.1. Топ-жанри за середньою популярністю** (`$group` + обчислюваний `hit_rate_pct` через `$cond`): лідери — `pop-film` (59.3), `k-pop` (57.0), `chill` (53.7). Цікаво: у `pop` найбільша частка хітів (31.7%), хоча середня популярність лише 47.6 — жанр «все або нічого».
 
@@ -156,7 +156,7 @@ mongosh "$MONGO_URI" --file queries/part3_indexes.js
 
 ## Частина 3 — Індекси та explain() (`queries/part3_indexes.js`)
 
-Повний вивід: `results/part3_indexes_output.txt`. Методика: `explain("executionStats")` до індексу → `createIndex` → той самий explain після.
+Повний вивід: `results/part3_indexes_output.txt` (містить повні filter/sort кожного тестового запиту та команди `createIndex`). Методика: `explain("executionStats")` до індексу → `createIndex` → той самий explain після.
 
 Створені індекси:
 - `idx_genre_popularity` — `{track_genre: 1, popularity: -1}` (compound, підтримує і фільтр, і сортування)
@@ -165,9 +165,9 @@ mongosh "$MONGO_URI" --file queries/part3_indexes.js
 
 | Запит | План | Час, мс | docsExamined | keysExamined | nReturned |
 |---|---|---|---|---|---|
-| A: `genre='pop' ∧ popularity≥70`, sort | COLLSCAN → IXSCAN | **81 → 1** | 113 999 → 317 | 0 → 317 | 317 |
-| B: `artists='Bad Bunny'` | COLLSCAN → IXSCAN | **89 → 2** | 113 999 → 416 | 0 → 416 | 416 |
-| C: `energy>0.9 ∧ danceability>0.8` | COLLSCAN → IXSCAN | **88 → 4** | 113 999 → 427 | 0 → 527 | 427 |
+| A: `genre='pop' ∧ popularity≥70`, sort | COLLSCAN → IXSCAN | **71 → 1** | 113 999 → 317 | 0 → 317 | 317 |
+| B: `artists='Bad Bunny'` | COLLSCAN → IXSCAN | **83 → 2** | 113 999 → 416 | 0 → 416 | 416 |
+| C: `energy>0.9 ∧ danceability>0.8` | COLLSCAN → IXSCAN | **80 → 4** | 113 999 → 427 | 0 → 527 | 427 |
 
 Висновки:
 - Ефект доведено об'єктивно: **~40–90× швидше**, замість 113 999 документів читається лише потрібні (~360× менше I/O).

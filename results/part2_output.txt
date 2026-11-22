@@ -2,7 +2,29 @@
 ========================================================
 2.1. Вкладені поля: energy > 0.8 AND danceability > 0.7
 ========================================================
-Кількість: 7066
+>>> ЗАПИТ:
+db.tracks.find(
+{
+  'audio_features.energy': {
+    '$gt': 0.8
+  },
+  'audio_features.danceability': {
+    '$gt': 0.7
+  }
+}
+, 
+{
+  _id: 0,
+  track_name: 1,
+  artists: 1,
+  'audio_features.energy': 1,
+  'audio_features.danceability': 1
+}
+)
+.limit(3)
+
+>>> РЕЗУЛЬТАТ:
+Кількість (countDocuments): 7066
 [
   {
     track_name: 'Kaleidoscope',
@@ -40,7 +62,40 @@
 ========================================================
 2.2. Діапазони: tempo [120,140], popularity >= 60, duration_sec [180,240]
 ========================================================
-Кількість: 1741
+>>> ЗАПИТ:
+db.tracks.find(
+{
+  'audio_features.tempo': {
+    '$gte': 120,
+    '$lte': 140
+  },
+  popularity: {
+    '$gte': 60
+  },
+  duration_sec: {
+    '$gte': 180,
+    '$lte': 240
+  }
+}
+, 
+{
+  _id: 0,
+  track_name: 1,
+  artists: 1,
+  popularity: 1,
+  duration_sec: 1,
+  'audio_features.tempo': 1
+}
+)
+.sort(
+{
+  popularity: -1
+}
+)
+.limit(3)
+
+>>> РЕЗУЛЬТАТ:
+Кількість (countDocuments): 1741
 [
   {
     track_name: 'Quevedo: Bzrp Music Sessions, Vol. 52',
@@ -83,7 +138,28 @@
 ========================================================
 2.3. Масиви: усі треки за участю Bad Bunny
 ========================================================
-Кількість: 416
+>>> ЗАПИТ:
+db.tracks.find(
+{
+  artists: 'Bad Bunny'
+}
+, 
+{
+  _id: 0,
+  track_name: 1,
+  artists: 1,
+  popularity: 1
+}
+)
+.sort(
+{
+  popularity: -1
+}
+)
+.limit(3)
+
+>>> РЕЗУЛЬТАТ:
+Кількість (countDocuments): 416
 [
   {
     track_name: 'Tití Me Preguntó',
@@ -112,7 +188,28 @@
 ========================================================
 2.4. $all: Daddy Yankee ТА Bad Bunny в одному треку
 ========================================================
-Кількість: 88
+>>> ЗАПИТ:
+db.tracks.find(
+{
+  artists: {
+    '$all': [
+      'Daddy Yankee',
+      'Bad Bunny'
+    ]
+  }
+}
+, 
+{
+  _id: 0,
+  track_name: 1,
+  artists: 1,
+  track_genre: 1
+}
+)
+.limit(3)
+
+>>> РЕЗУЛЬТАТ:
+Кількість (countDocuments): 88
 [
   {
     track_name: 'X ÚLTIMA VEZ',
@@ -141,10 +238,73 @@
 ]
 
 ========================================================
-2.5. $size: сольні треки (artists розміром 1)
+2.5a. $size: сольні треки (artists розміром 1)
 ========================================================
-Кількість: 83924
-З 3+ виконавцями: 8963
+>>> ЗАПИТ:
+db.tracks.find(
+{
+  artists: {
+    '$size': 1
+  }
+}
+, 
+{
+  _id: 0,
+  track_name: 1,
+  artists: 1
+}
+)
+.limit(3)
+
+>>> РЕЗУЛЬТАТ:
+Кількість (countDocuments): 83924
+[
+  {
+    track_name: 'Comedy',
+    artists: [
+      'Gen Hoshino'
+    ]
+  },
+  {
+    track_name: 'Ghost - Acoustic',
+    artists: [
+      'Ben Woodward'
+    ]
+  },
+  {
+    track_name: "Can't Help Falling In Love",
+    artists: [
+      'Kina Grannis'
+    ]
+  }
+]
+
+========================================================
+2.5b. $expr: колаборації з 3+ виконавцями
+========================================================
+>>> ЗАПИТ:
+db.tracks.find(
+{
+  '$expr': {
+    '$gte': [
+      {
+        '$size': '$artists'
+      },
+      3
+    ]
+  }
+}
+, 
+{
+  _id: 0,
+  track_name: 1,
+  artists: 1
+}
+)
+.limit(2)
+
+>>> РЕЗУЛЬТАТ:
+Кількість (countDocuments): 8963
 [
   {
     track_name: 'The Scientist',
@@ -167,7 +327,33 @@
 ========================================================
 2.6. $in: треки Bruno Mars або Silk Sonic
 ========================================================
-Кількість: 90
+>>> ЗАПИТ:
+db.tracks.find(
+{
+  artists: {
+    '$in': [
+      'Bruno Mars',
+      'Silk Sonic'
+    ]
+  }
+}
+, 
+{
+  _id: 0,
+  track_name: 1,
+  artists: 1,
+  popularity: 1
+}
+)
+.sort(
+{
+  popularity: -1
+}
+)
+.limit(3)
+
+>>> РЕЗУЛЬТАТ:
+Кількість (countDocuments): 90
 [
   {
     track_name: 'Locked out of Heaven',
@@ -198,7 +384,43 @@
 ========================================================
 2.7. $or: (explicit AND popularity>=70) OR instrumentalness>0.5
 ========================================================
-Кількість: 19727
+>>> ЗАПИТ:
+db.tracks.find(
+{
+  '$or': [
+    {
+      '$and': [
+        {
+          explicit: true
+        },
+        {
+          popularity: {
+            '$gte': 70
+          }
+        }
+      ]
+    },
+    {
+      'audio_features.instrumentalness': {
+        '$gt': 0.5
+      }
+    }
+  ]
+}
+, 
+{
+  _id: 0,
+  track_name: 1,
+  artists: 1,
+  explicit: 1,
+  popularity: 1,
+  'audio_features.instrumentalness': 1
+}
+)
+.limit(3)
+
+>>> РЕЗУЛЬТАТ:
+Кількість (countDocuments): 19727
 [
   {
     track_name: 'And I Love Her',
@@ -239,7 +461,34 @@
 ========================================================
 2.8. $regex: назва починається з 'love', valence > 0.7
 ========================================================
-Кількість: 143
+>>> ЗАПИТ:
+db.tracks.find(
+{
+  track_name: {
+    '$regex': /^love/i
+  },
+  'audio_features.valence': {
+    '$gt': 0.7
+  }
+}
+, 
+{
+  _id: 0,
+  track_name: 1,
+  artists: 1,
+  popularity: 1,
+  'audio_features.valence': 1
+}
+)
+.sort(
+{
+  popularity: -1
+}
+)
+.limit(3)
+
+>>> РЕЗУЛЬТАТ:
+Кількість (countDocuments): 143
 [
   {
     track_name: 'Love You Like A Love Song',
@@ -276,7 +525,38 @@
 ========================================================
 2.9. tier='high', explicit != true, жанр не з [pop, k-pop]
 ========================================================
-Кількість: 4103
+>>> ЗАПИТ:
+db.tracks.find(
+{
+  popularity_tier: 'high',
+  explicit: {
+    '$ne': true
+  },
+  track_genre: {
+    '$nin': [
+      'pop',
+      'k-pop'
+    ]
+  }
+}
+, 
+{
+  _id: 0,
+  track_name: 1,
+  artists: 1,
+  track_genre: 1,
+  popularity: 1
+}
+)
+.sort(
+{
+  popularity: -1
+}
+)
+.limit(3)
+
+>>> РЕЗУЛЬТАТ:
+Кількість (countDocuments): 4103
 [
   {
     track_name: 'Unholy (feat. Kim Petras)',
