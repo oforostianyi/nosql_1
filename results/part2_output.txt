@@ -1,15 +1,19 @@
 
 ========================================================
-2.1. Вкладені поля: energy > 0.8 AND danceability > 0.7
+Завдання 1. Треки для вечірки: danceability>0.7, energy>0.7, 3–5 хв
 ========================================================
 >>> ЗАПИТ:
 db.tracks.find(
 {
-  'audio_features.energy': {
-    '$gt': 0.8
-  },
   'audio_features.danceability': {
     '$gt': 0.7
+  },
+  'audio_features.energy': {
+    '$gt': 0.7
+  },
+  duration_ms: {
+    '$gte': 180000,
+    '$lte': 300000
   }
 }
 , 
@@ -17,74 +21,9 @@ db.tracks.find(
   _id: 0,
   track_name: 1,
   artists: 1,
-  'audio_features.energy': 1,
-  'audio_features.danceability': 1
-}
-)
-.limit(3)
-
->>> РЕЗУЛЬТАТ:
-Кількість (countDocuments): 7066
-[
-  {
-    track_name: 'Kaleidoscope',
-    artists: [
-      'A Great Big World'
-    ],
-    audio_features: {
-      danceability: 0.709,
-      energy: 0.913
-    }
-  },
-  {
-    track_name: 'アジアの純真',
-    artists: [
-      'Yosui Inoue',
-      'Tamio Okuda'
-    ],
-    audio_features: {
-      danceability: 0.732,
-      energy: 0.83
-    }
-  },
-  {
-    track_name: 'Rocksteady',
-    artists: [
-      'Marc Broussard'
-    ],
-    audio_features: {
-      danceability: 0.719,
-      energy: 0.849
-    }
-  }
-]
-
-========================================================
-2.2. Діапазони: tempo [120,140], popularity >= 60, duration_sec [180,240]
-========================================================
->>> ЗАПИТ:
-db.tracks.find(
-{
-  'audio_features.tempo': {
-    '$gte': 120,
-    '$lte': 140
-  },
-  popularity: {
-    '$gte': 60
-  },
-  duration_sec: {
-    '$gte': 180,
-    '$lte': 240
-  }
-}
-, 
-{
-  _id: 0,
-  track_name: 1,
-  artists: 1,
-  popularity: 1,
-  duration_sec: 1,
-  'audio_features.tempo': 1
+  duration_ms: 1,
+  'audio_features.danceability': 1,
+  'audio_features.energy': 1
 }
 )
 .sort(
@@ -92,498 +31,1717 @@ db.tracks.find(
   popularity: -1
 }
 )
-.limit(3)
+.limit(5)
 
 >>> РЕЗУЛЬТАТ:
-Кількість (countDocuments): 1741
+Кількість (countDocuments): 7311
 [
   {
-    track_name: 'Quevedo: Bzrp Music Sessions, Vol. 52',
-    popularity: 99,
+    track_name: 'Calm Down (with Selena Gomez)',
+    duration_ms: 239317,
     artists: [
-      'Bizarrap',
-      'Quevedo'
+      'Rema',
+      'Selena Gomez'
     ],
     audio_features: {
-      tempo: 128.033
-    },
-    duration_sec: 198.9
+      danceability: 0.801,
+      energy: 0.806
+    }
   },
   {
-    track_name: 'Ferrari',
-    popularity: 90,
+    track_name: 'LOKERA',
+    duration_ms: 195294,
     artists: [
-      'James Hype',
-      'Miggy Dela Rosa'
+      'Rauw Alejandro',
+      'Lyanno',
+      'Brray'
     ],
     audio_features: {
-      tempo: 125.004
-    },
-    duration_sec: 186.7
+      danceability: 0.834,
+      energy: 0.828
+    }
   },
   {
-    track_name: 'Ferrari',
-    popularity: 90,
+    track_name: 'LOKERA',
+    duration_ms: 195294,
     artists: [
-      'James Hype',
-      'Miggy Dela Rosa'
+      'Rauw Alejandro',
+      'Lyanno',
+      'Brray'
     ],
     audio_features: {
-      tempo: 125.004
-    },
-    duration_sec: 186.7
-  }
-]
-
-========================================================
-2.3. Масиви: усі треки за участю Bad Bunny
-========================================================
->>> ЗАПИТ:
-db.tracks.find(
-{
-  artists: 'Bad Bunny'
-}
-, 
-{
-  _id: 0,
-  track_name: 1,
-  artists: 1,
-  popularity: 1
-}
-)
-.sort(
-{
-  popularity: -1
-}
-)
-.limit(3)
-
->>> РЕЗУЛЬТАТ:
-Кількість (countDocuments): 416
-[
-  {
-    track_name: 'Tití Me Preguntó',
-    popularity: 97,
-    artists: [
-      'Bad Bunny'
-    ]
+      danceability: 0.834,
+      energy: 0.828
+    }
   },
   {
-    track_name: 'Tití Me Preguntó',
-    popularity: 97,
-    artists: [
-      'Bad Bunny'
-    ]
-  },
-  {
-    track_name: 'Me Porto Bonito',
-    popularity: 97,
+    track_name: 'Party',
+    duration_ms: 227628,
     artists: [
       'Bad Bunny',
-      'Chencho Corleone'
-    ]
+      'Rauw Alejandro'
+    ],
+    audio_features: {
+      danceability: 0.829,
+      energy: 0.799
+    }
+  },
+  {
+    track_name: 'Party',
+    duration_ms: 227628,
+    artists: [
+      'Bad Bunny',
+      'Rauw Alejandro'
+    ],
+    audio_features: {
+      danceability: 0.829,
+      energy: 0.799
+    }
   }
 ]
 
 ========================================================
-2.4. $all: Daddy Yankee ТА Bad Bunny в одному треку
+Завдання 2. Топ-20 виконавців: >=3 треків і min(popularity) >= 60
 ========================================================
 >>> ЗАПИТ:
-db.tracks.find(
-{
-  artists: {
-    '$all': [
-      'Daddy Yankee',
-      'Bad Bunny'
-    ]
-  }
-}
-, 
-{
-  _id: 0,
-  track_name: 1,
-  artists: 1,
-  track_genre: 1
-}
-)
-.limit(3)
-
->>> РЕЗУЛЬТАТ:
-Кількість (countDocuments): 88
+db.tracks.aggregate(
 [
   {
-    track_name: 'X ÚLTIMA VEZ',
-    track_genre: 'hip-hop',
-    artists: [
-      'Daddy Yankee',
-      'Bad Bunny'
-    ]
+    '$unwind': '$artists'
   },
   {
-    track_name: 'X ÚLTIMA VEZ',
-    track_genre: 'hip-hop',
-    artists: [
-      'Daddy Yankee',
-      'Bad Bunny'
-    ]
-  },
-  {
-    track_name: 'Vuelve',
-    track_genre: 'hip-hop',
-    artists: [
-      'Daddy Yankee',
-      'Bad Bunny'
-    ]
-  }
-]
-
-========================================================
-2.5a. $size: сольні треки (artists розміром 1)
-========================================================
->>> ЗАПИТ:
-db.tracks.find(
-{
-  artists: {
-    '$size': 1
-  }
-}
-, 
-{
-  _id: 0,
-  track_name: 1,
-  artists: 1
-}
-)
-.limit(3)
-
->>> РЕЗУЛЬТАТ:
-Кількість (countDocuments): 83924
-[
-  {
-    track_name: 'Comedy',
-    artists: [
-      'Gen Hoshino'
-    ]
-  },
-  {
-    track_name: 'Ghost - Acoustic',
-    artists: [
-      'Ben Woodward'
-    ]
-  },
-  {
-    track_name: "Can't Help Falling In Love",
-    artists: [
-      'Kina Grannis'
-    ]
-  }
-]
-
-========================================================
-2.5b. $expr: колаборації з 3+ виконавцями
-========================================================
->>> ЗАПИТ:
-db.tracks.find(
-{
-  '$expr': {
-    '$gte': [
-      {
-        '$size': '$artists'
+    '$group': {
+      _id: '$artists',
+      track_count: {
+        '$sum': 1
       },
-      3
-    ]
-  }
-}
-, 
-{
-  _id: 0,
-  track_name: 1,
-  artists: 1
-}
-)
-.limit(2)
-
->>> РЕЗУЛЬТАТ:
-Кількість (countDocuments): 8963
-[
-  {
-    track_name: 'The Scientist',
-    artists: [
-      'Tyler Ward',
-      'Lindsey Stirling',
-      'Kina Grannis'
-    ]
-  },
-  {
-    track_name: 'Love Story',
-    artists: [
-      'Tyler Ward',
-      'Karis',
-      'Ray Lorraine'
-    ]
-  }
-]
-
-========================================================
-2.6. $in: треки Bruno Mars або Silk Sonic
-========================================================
->>> ЗАПИТ:
-db.tracks.find(
-{
-  artists: {
-    '$in': [
-      'Bruno Mars',
-      'Silk Sonic'
-    ]
-  }
-}
-, 
-{
-  _id: 0,
-  track_name: 1,
-  artists: 1,
-  popularity: 1
-}
-)
-.sort(
-{
-  popularity: -1
-}
-)
-.limit(3)
-
->>> РЕЗУЛЬТАТ:
-Кількість (countDocuments): 90
-[
-  {
-    track_name: 'Locked out of Heaven',
-    popularity: 87,
-    artists: [
-      'Bruno Mars'
-    ]
-  },
-  {
-    track_name: 'Leave The Door Open',
-    popularity: 84,
-    artists: [
-      'Bruno Mars',
-      'Anderson .Paak',
-      'Silk Sonic'
-    ]
-  },
-  {
-    track_name: 'Uptown Funk (feat. Bruno Mars)',
-    popularity: 83,
-    artists: [
-      'Mark Ronson',
-      'Bruno Mars'
-    ]
-  }
-]
-
-========================================================
-2.7. $or: (explicit AND popularity>=70) OR instrumentalness>0.5
-========================================================
->>> ЗАПИТ:
-db.tracks.find(
-{
-  '$or': [
-    {
-      '$and': [
-        {
-          explicit: true
-        },
-        {
-          popularity: {
-            '$gte': 70
-          }
-        }
-      ]
-    },
-    {
-      'audio_features.instrumentalness': {
-        '$gt': 0.5
+      min_popularity: {
+        '$min': '$popularity'
+      },
+      avg_popularity: {
+        '$avg': '$popularity'
       }
     }
-  ]
+  },
+  {
+    '$match': {
+      track_count: {
+        '$gte': 3
+      },
+      min_popularity: {
+        '$gte': 60
+      }
+    }
+  },
+  {
+    '$project': {
+      _id: 0,
+      artist: '$_id',
+      track_count: 1,
+      min_popularity: 1,
+      avg_popularity: {
+        '$round': [
+          '$avg_popularity',
+          1
+        ]
+      }
+    }
+  },
+  {
+    '$sort': {
+      avg_popularity: -1,
+      track_count: -1
+    }
+  },
+  {
+    '$limit': 20
+  }
+]
+)
+
+>>> РЕЗУЛЬТАТ:
+Документів у результаті: 20
+[
+  {
+    track_count: 3,
+    min_popularity: 89,
+    artist: 'Harry Styles',
+    avg_popularity: 92
+  },
+  {
+    track_count: 4,
+    min_popularity: 90,
+    artist: 'Luar La L',
+    avg_popularity: 90.5
+  },
+  {
+    track_count: 5,
+    min_popularity: 86,
+    artist: 'Olivia Rodrigo',
+    avg_popularity: 87.4
+  },
+  {
+    track_count: 4,
+    min_popularity: 87,
+    artist: 'BYOR',
+    avg_popularity: 87
+  },
+  {
+    track_count: 3,
+    min_popularity: 79,
+    artist: 'IVE',
+    avg_popularity: 84
+  },
+  {
+    track_count: 12,
+    min_popularity: 76,
+    artist: 'Måneskin',
+    avg_popularity: 83.7
+  },
+  {
+    track_count: 11,
+    min_popularity: 77,
+    artist: 'Lil Nas X',
+    avg_popularity: 83.5
+  },
+  {
+    track_count: 3,
+    min_popularity: 81,
+    artist: 'Morgan Wallen',
+    avg_popularity: 83.3
+  },
+  {
+    track_count: 5,
+    min_popularity: 80,
+    artist: 'One Direction',
+    avg_popularity: 83
+  },
+  {
+    track_count: 5,
+    min_popularity: 80,
+    artist: 'TV Girl',
+    avg_popularity: 82
+  },
+  {
+    track_count: 4,
+    min_popularity: 81,
+    artist: 'Mac DeMarco',
+    avg_popularity: 81.5
+  },
+  {
+    track_count: 3,
+    min_popularity: 81,
+    artist: 'Cults',
+    avg_popularity: 81.3
+  },
+  {
+    track_count: 4,
+    min_popularity: 79,
+    artist: 'Ricky Montgomery',
+    avg_popularity: 80.5
+  },
+  {
+    track_count: 3,
+    min_popularity: 79,
+    artist: 'Luke Combs',
+    avg_popularity: 80.3
+  },
+  {
+    track_count: 3,
+    min_popularity: 80,
+    artist: 'Declan McKenna',
+    avg_popularity: 80
+  },
+  {
+    track_count: 3,
+    min_popularity: 80,
+    artist: 'Joy Again',
+    avg_popularity: 80
+  },
+  {
+    track_count: 7,
+    min_popularity: 69,
+    artist: 'Mora',
+    avg_popularity: 79.7
+  },
+  {
+    track_count: 3,
+    min_popularity: 70,
+    artist: 'Maroon 5',
+    avg_popularity: 79.7
+  },
+  {
+    track_count: 7,
+    min_popularity: 73,
+    artist: 'Beach Bunny',
+    avg_popularity: 79.4
+  },
+  {
+    track_count: 3,
+    min_popularity: 79,
+    artist: "Gigi D'Agostino",
+    avg_popularity: 79
+  }
+]
+
+========================================================
+Завдання 3. Темпо-викиди: tempo > avg + 2*stdDevPop по жанру
+========================================================
+>>> ЗАПИТ:
+db.tracks.aggregate(
+[
+  {
+    '$group': {
+      _id: '$track_genre',
+      avg_tempo: {
+        '$avg': '$audio_features.tempo'
+      },
+      std_tempo: {
+        '$stdDevPop': '$audio_features.tempo'
+      },
+      tracks: {
+        '$push': {
+          _id: '$_id',
+          track_name: '$track_name',
+          popularity: '$popularity',
+          artists: '$artists',
+          audio_features: {
+            tempo: '$audio_features.tempo'
+          }
+        }
+      }
+    }
+  },
+  {
+    '$addFields': {
+      outlier_threshold: {
+        '$add': [
+          '$avg_tempo',
+          {
+            '$multiply': [
+              2,
+              '$std_tempo'
+            ]
+          }
+        ]
+      }
+    }
+  },
+  {
+    '$addFields': {
+      outlier_tracks: {
+        '$filter': {
+          input: '$tracks',
+          as: 't',
+          cond: {
+            '$gt': [
+              '$$t.audio_features.tempo',
+              '$outlier_threshold'
+            ]
+          }
+        }
+      }
+    }
+  },
+  {
+    '$match': {
+      '$expr': {
+        '$gt': [
+          {
+            '$size': '$outlier_tracks'
+          },
+          0
+        ]
+      }
+    }
+  },
+  {
+    '$project': {
+      _id: 0,
+      genre: '$_id',
+      avg_tempo: {
+        '$round': [
+          '$avg_tempo',
+          1
+        ]
+      },
+      outlier_threshold: {
+        '$round': [
+          '$outlier_threshold',
+          1
+        ]
+      },
+      outlier_tracks: 1
+    }
+  },
+  {
+    '$sort': {
+      genre: 1
+    }
+  }
+]
+)
+
+>>> РЕЗУЛЬТАТ:
+Документів у результаті: 112
+[
+  {
+    outlier_tracks: [
+      {
+        _id: ObjectId('6b02fb1ea2c90c5e22634729'),
+        track_name: "Can't Help Falling In Love",
+        popularity: 71,
+        artists: [
+          'Kina Grannis'
+        ],
+        audio_features: {
+          tempo: 181.74
+        }
+      },
+      {
+        _id: ObjectId('6b02fb1ea2c90c5e22634746'),
+        track_name: 'All I Want For Christmas Is A Real Good Tan',
+        popularity: 0,
+        artists: [
+          'Chord Overstreet'
+        ],
+        audio_features: {
+          tempo: 202.019
+        }
+      },
+      {
+        _id: ObjectId('6b02fb1ea2c90c5e2263477c'),
+        track_name: 'Brave',
+        popularity: 70,
+        artists: [
+          'Sara Bareilles'
+        ],
+        audio_features: {
+          tempo: 185.063
+        }
+      },
+      {
+        _id: ObjectId('6b02fb1ea2c90c5e226347a3'),
+        track_name: 'Believer (Remix)',
+        popularity: 42,
+        artists: [
+          'Ben Woodward'
+        ],
+        audio_features: {
+          tempo: 187.484
+        }
+      },
+      {
+        _id: ObjectId('6b02fb1ea2c90c5e2263484b'),
+        track_name: '30,000 Feet',
+        popularity: 57,
+        artists: [
+          'Ben Rector'
+        ],
+        audio_features: {
+          tempo: 179.921
+        }
+      },
+      {
+        _id: ObjectId('6b02fb1ea2c90c5e2263485a'),
+        track_name: 'Shallow - Acoustic',
+        popularity: 52,
+        artists: [
+          'Tyler Ward',
+          'Madysyn'
+        ],
+        audio_features: {
+          tempo: 187.057
+        }
+      },
+      {
+        _id: ObjectId('6b02fb1ea2c90c5e22634887'),
+        track_name: '太陽さん',
+        popularity: 55,
+        artists: [
+          'Ichiko Aoba'
+        ],
+        audio_features: {
+          tempo: 181.988
+        }
+      },
+      {
+        _id: ObjectId('6b02fb1ea2c90c5e226348a6'),
+        track_name: 'Fast Car',
+        popularity: 61,
+        artists: [
+          'Boyce Avenue',
+          'Kina Grannis'
+        ],
+        audio_features: {
+          tempo: 204.961
+        }
+      },
+      {
+        _id: ObjectId('6b02fb1ea2c90c5e226348c5'),
+        track_name: 'Wish List',
+        popularity: 46,
+        artists: [
+          'Canyon City'
+        ],
+        audio_features: {
+          tempo: 201.008
+        }
+      },
+      {
+        _id: ObjectId('6b02fb1ea2c90c5e226348e5'),
+        track_name: 'The Legend of Olog-hai, Pt. 1',
+        popularity: 31,
+        artists: [
+          'The Bridge City Sinners'
+        ],
+        audio_features: {
+          tempo: 182.379
+        }
+      },
+      {
+        _id: ObjectId('6b02fb1ea2c90c5e226348f2'),
+        track_name: 'Anyone',
+        popularity: 53,
+        artists: [
+          'Bailey Jehl'
+        ],
+        audio_features: {
+          tempo: 199.805
+        }
+      },
+      {
+        _id: ObjectId('6b02fb1ea2c90c5e22634915'),
+        track_name: 'Living My Best Life',
+        popularity: 59,
+        artists: [
+          'Ben Rector'
+        ],
+        audio_features: {
+          tempo: 178.828
+        }
+      },
+      {
+        _id: ObjectId('6b02fb1ea2c90c5e2263492d'),
+        track_name: 'Running Up That Hill (A Deal With God) - Acoustic',
+        popularity: 51,
+        artists: [
+          'Jonah Baker'
+        ],
+        audio_features: {
+          tempo: 203.816
+        }
+      },
+      {
+        _id: ObjectId('6b02fb1ea2c90c5e2263494b'),
+        track_name: 'Nickel Plated',
+        popularity: 29,
+        artists: [
+          'Get Dead'
+        ],
+        audio_features: {
+          tempo: 179.92
+        }
+      },
+      {
+        _id: ObjectId('6b02fb1ea2c90c5e22634950'),
+        track_name: 'Somebody That I Used To Know',
+        popularity: 49,
+        artists: [
+          'Lúc'
+        ],
+        audio_features: {
+          tempo: 183.571
+        }
+      },
+      {
+        _id: ObjectId('6b02fb1ea2c90c5e22634957'),
+        track_name: 'Wanted Man',
+        popularity: 59,
+        artists: [
+          'Mat Kearney'
+        ],
+        audio_features: {
+          tempo: 203.651
+        }
+      },
+      {
+        _id: ObjectId('6b02fb1ea2c90c5e22634967'),
+        track_name: "Don't Know What I Want",
+        popularity: 24,
+        artists: [
+          'Gabrielle Aplin'
+        ],
+        audio_features: {
+          tempo: 180.075
+        }
+      },
+      {
+        _id: ObjectId('6b02fb1ea2c90c5e2263497d'),
+        track_name: '8 Track',
+        popularity: 28,
+        artists: [
+          'Get Dead'
+        ],
+        audio_features: {
+          tempo: 197.008
+        }
+      },
+      {
+        _id: ObjectId('6b02fb1ea2c90c5e226349b5'),
+        track_name: 'Longest Night',
+        popularity: 43,
+        artists: [
+          'Howie Day'
+        ],
+        audio_features: {
+          tempo: 202.098
+        }
+      },
+      {
+        _id: ObjectId('6b02fb1ea2c90c5e226349fc'),
+        track_name: 'Pirates of the Caribbean Theme',
+        popularity: 30,
+        artists: [
+          'Eddie van der Meer'
+        ],
+        audio_features: {
+          tempo: 188.325
+        }
+      },
+      {
+        _id: ObjectId('6b02fb1ea2c90c5e22634a09'),
+        track_name: 'V: Fair Trade Death March',
+        popularity: 27,
+        artists: [
+          'RENT STRIKE'
+        ],
+        audio_features: {
+          tempo: 181.81
+        }
+      },
+      {
+        _id: ObjectId('6b02fb1ea2c90c5e22634a2a'),
+        track_name: 'Suitcase',
+        popularity: 46,
+        artists: [
+          'JJ Heller'
+        ],
+        audio_features: {
+          tempo: 179.605
+        }
+      },
+      {
+        _id: ObjectId('6b02fb1ea2c90c5e22634a55'),
+        track_name: 'Supermarket Flowers',
+        popularity: 45,
+        artists: [
+          'Postcards & Polaroids',
+          'Sad Boy'
+        ],
+        audio_features: {
+          tempo: 180.191
+        }
+      },
+      {
+        _id: ObjectId('6b02fb1ea2c90c5e22634a5e'),
+        track_name: 'Paperweight by Joshua Radin and Schuyler Fisk',
+        popularity: 49,
+        artists: [
+          'Joshua Radin'
+        ],
+        audio_features: {
+          tempo: 179.844
+        }
+      },
+      {
+        _id: ObjectId('6b02fb1ea2c90c5e22634a7d'),
+        track_name: 'Teenage Dream',
+        popularity: 48,
+        artists: [
+          'Sara Farell'
+        ],
+        audio_features: {
+          tempo: 179.911
+        }
+      },
+      {
+        _id: ObjectId('6b02fb1ea2c90c5e22634a86'),
+        track_name: 'As Long as You Love Me',
+        popularity: 54,
+        artists: [
+          'Erato',
+          'Charlotte Almgren'
+        ],
+        audio_features: {
+          tempo: 202.996
+        }
+      },
+      {
+        _id: ObjectId('6b02fb1ea2c90c5e22634aa4'),
+        track_name: 'Clawfoot',
+        popularity: 26,
+        artists: [
+          'Pigeon Pit'
+        ],
+        audio_features: {
+          tempo: 185.147
+        }
+      },
+      {
+        _id: ObjectId('6b02fb1ea2c90c5e22634aaa'),
+        track_name: 'Sombody else - Acoustic',
+        popularity: 42,
+        artists: [
+          'Sara Farell'
+        ],
+        audio_features: {
+          tempo: 201.64
+        }
+      },
+      {
+        _id: ObjectId('6b02fb1ea2c90c5e22634ac4'),
+        track_name: 'Untainted Innocence',
+        popularity: 26,
+        artists: [
+          'Steve Pulvers'
+        ],
+        audio_features: {
+          tempo: 179.941
+        }
+      },
+      {
+        _id: ObjectId('6b02fb1ea2c90c5e22634ad5'),
+        track_name: 'Rivers',
+        popularity: 26,
+        artists: [
+          'Frank Turner'
+        ],
+        audio_features: {
+          tempo: 183.874
+        }
+      },
+      {
+        _id: ObjectId('6b02fb1ea2c90c5e22634ad8'),
+        track_name: 'Dance, Motherfucker, Dance!',
+        popularity: 27,
+        artists: [
+          'Violent Femmes'
+        ],
+        audio_features: {
+          tempo: 193.395
+        }
+      },
+      {
+        _id: ObjectId('6b02fb1ea2c90c5e22634af3'),
+        track_name: 'I Want It That Way - Acoustic Covers of Popular Songs',
+        popularity: 51,
+        artists: [
+          'Son&Dad',
+          'Filip Nordin'
+        ],
+        audio_features: {
+          tempo: 203.571
+        }
+      },
+      {
+        _id: ObjectId('6b02fb1ea2c90c5e22634af8'),
+        track_name: 'Cried Like A Baby',
+        popularity: 25,
+        artists: [
+          'Rory Block'
+        ],
+        audio_features: {
+          tempo: 179.76
+        }
+      },
+      {
+        _id: ObjectId('6b02fb1ea2c90c5e22634b00'),
+        track_name: 'Make It Easy On Yourself',
+        popularity: 25,
+        artists: [
+          'Gail Blanco'
+        ],
+        audio_features: {
+          tempo: 180.048
+        }
+      }
+    ],
+    genre: 'acoustic',
+    avg_tempo: 119,
+    outlier_threshold: 178.5
+  },
+  {
+    outlier_tracks: [
+      {
+        _id: ObjectId('6b02fb1ea2c90c5e22634b1a'),
+        track_name: 'Breaco',
+        popularity: 40,
+        artists: [
+          'Criolo'
+        ],
+        audio_features: {
+          tempo: 182.026
+        }
+      },
+      {
+        _id: ObjectId('6b02fb1ea2c90c5e22634b2c'),
+        track_name: 'Tengo Luquita',
+        popularity: 45,
+        artists: [
+          'Juanafé'
+        ],
+        audio_features: {
+          tempo: 176.27
+        }
+      },
+      {
+        _id: ObjectId('6b02fb1ea2c90c5e22634b40'),
+        track_name: 'Meghar Jolonga',
+        popularity: 25,
+        artists: [
+          'Pompi'
+        ],
+        audio_features: {
+          tempo: 200.152
+        }
+      },
+      {
+        _id: ObjectId('6b02fb1ea2c90c5e22634b4c'),
+        track_name: 'Oxidados',
+        popularity: 35,
+        artists: [
+          'Plastilina Mosh'
+        ],
+        audio_features: {
+          tempo: 182.051
+        }
+      },
+      {
+        _id: ObjectId('6b02fb1ea2c90c5e22634b63'),
+        track_name: 'Bala na Agulha',
+        popularity: 36,
+        artists: [
+          'BaianaSystem'
+        ],
+        audio_features: {
+          tempo: 180.052
+        }
+      },
+      {
+        _id: ObjectId('6b02fb1ea2c90c5e22634b65'),
+        track_name: 'Makoti',
+        popularity: 0,
+        artists: [
+          'Hugh Masekela'
+        ],
+        audio_features: {
+          tempo: 220.081
+        }
+      },
+      {
+        _id: ObjectId('6b02fb1ea2c90c5e22634b69'),
+        track_name: 'Grajauex - Live',
+        popularity: 33,
+        artists: [
+          'Criolo',
+          'Emicida'
+        ],
+        audio_features: {
+          tempo: 176.67
+        }
+      },
+      {
+        _id: ObjectId('6b02fb1ea2c90c5e22634b74'),
+        track_name: 'Ruby',
+        popularity: 19,
+        artists: [
+          'Ali Farka Touré',
+          'Toumani Diabaté'
+        ],
+        audio_features: {
+          tempo: 177.659
+        }
+      },
+      {
+        _id: ObjectId('6b02fb1ea2c90c5e22634b7b'),
+        track_name: 'Bienvenidos A Mi Mundo',
+        popularity: 33,
+        artists: [
+          'Calle 13'
+        ],
+        audio_features: {
+          tempo: 189.895
+        }
+      },
+      {
+        _id: ObjectId('6b02fb1ea2c90c5e22634b7f'),
+        track_name: 'Crece',
+        popularity: 31,
+        artists: [
+          'Jorge Drexler'
+        ],
+        audio_features: {
+          tempo: 174.931
+        }
+      },
+      {
+        _id: ObjectId('6b02fb1ea2c90c5e22634b88'),
+        track_name: 'Ode To Mauricio Garces',
+        popularity: 33,
+        artists: [
+          'Plastilina Mosh'
+        ],
+        audio_features: {
+          tempo: 174.112
+        }
+      },
+      {
+        _id: ObjectId('6b02fb1ea2c90c5e22634b96'),
+        track_name: 'Makoti',
+        popularity: 0,
+        artists: [
+          'Hugh Masekela'
+        ],
+        audio_features: {
+          tempo: 220.081
+        }
+      },
+      {
+        _id: ObjectId('6b02fb1ea2c90c5e22634b9e'),
+        track_name: 'Makoti',
+        popularity: 0,
+        artists: [
+          'Hugh Masekela'
+        ],
+        audio_features: {
+          tempo: 220.081
+        }
+      },
+      {
+        _id: ObjectId('6b02fb1ea2c90c5e22634ba6'),
+        track_name: 'Bang Data',
+        popularity: 42,
+        artists: [
+          'Bang Data'
+        ],
+        audio_features: {
+          tempo: 171.958
+        }
+      },
+      {
+        _id: ObjectId('6b02fb1ea2c90c5e22634bd3'),
+        track_name: 'Coroné Antonio Bento',
+        popularity: 28,
+        artists: [
+          'Criolo'
+        ],
+        audio_features: {
+          tempo: 176.083
+        }
+      },
+      {
+        _id: ObjectId('6b02fb1ea2c90c5e22634bdd'),
+        track_name: 'LadoB',
+        popularity: 25,
+        artists: [
+          'Afrocidade'
+        ],
+        audio_features: {
+          tempo: 192.004
+        }
+      },
+      {
+        _id: ObjectId('6b02fb1ea2c90c5e22634be2'),
+        track_name: 'Mi Gente',
+        popularity: 25,
+        artists: [
+          'Timoneki',
+          'Silvana Estrada'
+        ],
+        audio_features: {
+          tempo: 175.815
+        }
+      },
+      {
+        _id: ObjectId('6b02fb1ea2c90c5e22634be6'),
+        track_name: 'Dueña de Mi',
+        popularity: 25,
+        artists: [
+          'La Misa Negra'
+        ],
+        audio_features: {
+          tempo: 183.938
+        }
+      },
+      {
+        _id: ObjectId('6b02fb1ea2c90c5e22634bf2'),
+        track_name: 'Durante',
+        popularity: 27,
+        artists: [
+          'Jorge Drexler'
+        ],
+        audio_features: {
+          tempo: 177.914
+        }
+      },
+      {
+        _id: ObjectId('6b02fb1ea2c90c5e22634c01'),
+        track_name: 'I´ve Got That Milton Pacheco Kinda Feeling - Melancolic Mix',
+        popularity: 28,
+        artists: [
+          'Plastilina Mosh'
+        ],
+        audio_features: {
+          tempo: 178.064
+        }
+      },
+      {
+        _id: ObjectId('6b02fb1ea2c90c5e22634c0f'),
+        track_name: 'Tomorrow',
+        popularity: 24,
+        artists: [
+          "Jor'dan Armstrong"
+        ],
+        audio_features: {
+          tempo: 174.967
+        }
+      },
+      {
+        _id: ObjectId('6b02fb1ea2c90c5e22634c16'),
+        track_name: 'Esto Con Eso',
+        popularity: 25,
+        artists: [
+          'Calle 13'
+        ],
+        audio_features: {
+          tempo: 190.001
+        }
+      },
+      {
+        _id: ObjectId('6b02fb1ea2c90c5e22634c1d'),
+        track_name: 'Tal Para Cual',
+        popularity: 27,
+        artists: [
+          'Calle 13'
+        ],
+        audio_features: {
+          tempo: 175.999
+        }
+      },
+      {
+        _id: ObjectId('6b02fb1ea2c90c5e22634c20'),
+        track_name: 'Cumbia Milagrosa',
+        popularity: 23,
+        artists: [
+          'La Misa Negra'
+        ],
+        audio_features: {
+          tempo: 203.01
+        }
+      },
+      {
+        _id: ObjectId('6b02fb1ea2c90c5e22634c31'),
+        track_name: 'Lambe-Lambe',
+        popularity: 23,
+        artists: [
+          'Samuca e a Selva',
+          'Illy'
+        ],
+        audio_features: {
+          tempo: 172.055
+        }
+      },
+      {
+        _id: ObjectId('6b02fb1ea2c90c5e22634c48'),
+        track_name: 'More Mess on My Thing',
+        popularity: 57,
+        artists: [
+          'The Poets Of Rhythm'
+        ],
+        audio_features: {
+          tempo: 190.509
+        }
+      },
+      {
+        _id: ObjectId('6b02fb1ea2c90c5e22634c4a'),
+        track_name: 'Mictlán',
+        popularity: 23,
+        artists: [
+          'Timoneki'
+        ],
+        audio_features: {
+          tempo: 180.202
+        }
+      },
+      {
+        _id: ObjectId('6b02fb1ea2c90c5e22634c81'),
+        track_name: 'Ivory and Blue - Reprise',
+        popularity: 22,
+        artists: [
+          'Menahan Street Band'
+        ],
+        audio_features: {
+          tempo: 174.761
+        }
+      },
+      {
+        _id: ObjectId('6b02fb1ea2c90c5e22634c88'),
+        track_name: 'Bienvenidos A Mi Mundo',
+        popularity: 24,
+        artists: [
+          'Calle 13'
+        ],
+        audio_features: {
+          tempo: 189.895
+        }
+      },
+      {
+        _id: ObjectId('6b02fb1ea2c90c5e22634c9b'),
+        track_name: "Sabrina (feat. Oscar D'León)",
+        popularity: 23,
+        artists: [
+          'Los Amigos Invisibles',
+          "Oscar D'León"
+        ],
+        audio_features: {
+          tempo: 195.646
+        }
+      },
+      {
+        _id: ObjectId('6b02fb1ea2c90c5e22634c9f'),
+        track_name: 'Batom',
+        popularity: 21,
+        artists: [
+          'ATR',
+          'Luedji Luna'
+        ],
+        audio_features: {
+          tempo: 194.015
+        }
+      },
+      {
+        _id: ObjectId('6b02fb1ea2c90c5e22634ca9'),
+        track_name: 'Uiyi Guaye',
+        popularity: 22,
+        artists: [
+          'Calle 13'
+        ],
+        audio_features: {
+          tempo: 183.918
+        }
+      },
+      {
+        _id: ObjectId('6b02fb1ea2c90c5e22634cab'),
+        track_name: 'Blow My Mind - Spanish Remix',
+        popularity: 20,
+        artists: [
+          'Limoblaze',
+          'Ada Betsabe',
+          'Principal'
+        ],
+        audio_features: {
+          tempo: 189.916
+        }
+      },
+      {
+        _id: ObjectId('6b02fb1ea2c90c5e22634cb3'),
+        track_name: 'Juaneco Y La Negra',
+        popularity: 20,
+        artists: [
+          'Thee Commons'
+        ],
+        audio_features: {
+          tempo: 192.492
+        }
+      },
+      {
+        _id: ObjectId('6b02fb1ea2c90c5e22634cba'),
+        track_name: 'Haja Axé',
+        popularity: 20,
+        artists: [
+          'Samuca e a Selva',
+          'Onã'
+        ],
+        audio_features: {
+          tempo: 179.938
+        }
+      },
+      {
+        _id: ObjectId('6b02fb1ea2c90c5e22634d26'),
+        track_name: 'An Epic Story',
+        popularity: 20,
+        artists: [
+          'Mulatu Astatke',
+          'The Heliocentrics'
+        ],
+        audio_features: {
+          tempo: 173.954
+        }
+      },
+      {
+        _id: ObjectId('6b02fb1ea2c90c5e22634d2c'),
+        track_name: 'Oxidados',
+        popularity: 20,
+        artists: [
+          'Plastilina Mosh'
+        ],
+        audio_features: {
+          tempo: 182.069
+        }
+      },
+      {
+        _id: ObjectId('6b02fb1ea2c90c5e22634d74'),
+        track_name: 'Se Vale To-To',
+        popularity: 21,
+        artists: [
+          'Calle 13'
+        ],
+        audio_features: {
+          tempo: 175.979
+        }
+      },
+      {
+        _id: ObjectId('6b02fb1ea2c90c5e22634d93'),
+        track_name: 'Baile De Los Pobres',
+        popularity: 21,
+        artists: [
+          'Calle 13'
+        ],
+        audio_features: {
+          tempo: 179.996
+        }
+      },
+      {
+        _id: ObjectId('6b02fb1ea2c90c5e22634da2'),
+        track_name: 'Forgiveness',
+        popularity: 18,
+        artists: [
+          'Eddie Neblett'
+        ],
+        audio_features: {
+          tempo: 172.031
+        }
+      },
+      {
+        _id: ObjectId('6b02fb1ea2c90c5e22634da6'),
+        track_name: 'Playa Azul',
+        popularity: 21,
+        artists: [
+          'Los Amigos Invisibles'
+        ],
+        audio_features: {
+          tempo: 175.979
+        }
+      },
+      {
+        _id: ObjectId('6b02fb1ea2c90c5e22634ddd'),
+        track_name: 'Vai C Bom',
+        popularity: 18,
+        artists: [
+          'Zé Bigode Orquestra'
+        ],
+        audio_features: {
+          tempo: 189.944
+        }
+      },
+      {
+        _id: ObjectId('6b02fb1ea2c90c5e22634e09'),
+        track_name: 'Life',
+        popularity: 17,
+        artists: [
+          'Sharyn',
+          'Triple O'
+        ],
+        audio_features: {
+          tempo: 180.071
+        }
+      },
+      {
+        _id: ObjectId('6b02fb1ea2c90c5e22634e1f'),
+        track_name: 'Pipi',
+        popularity: 20,
+        artists: [
+          'Los Amigos Invisibles'
+        ],
+        audio_features: {
+          tempo: 174.968
+        }
+      },
+      {
+        _id: ObjectId('6b02fb1ea2c90c5e22634e31'),
+        track_name: 'Life of Grace',
+        popularity: 34,
+        artists: [
+          'Louis Pascal'
+        ],
+        audio_features: {
+          tempo: 193.616
+        }
+      },
+      {
+        _id: ObjectId('6b02fb1ea2c90c5e22634e3d'),
+        track_name: 'Searching',
+        popularity: 16,
+        artists: [
+          'Jlyricz'
+        ],
+        audio_features: {
+          tempo: 204.128
+        }
+      },
+      {
+        _id: ObjectId('6b02fb1ea2c90c5e22634e79'),
+        track_name: 'Donde Vas',
+        popularity: 16,
+        artists: [
+          'Timoneki'
+        ],
+        audio_features: {
+          tempo: 180.008
+        }
+      },
+      {
+        _id: ObjectId('6b02fb1ea2c90c5e22634e95'),
+        track_name: 'Who Am I (Psalm 8:4)',
+        popularity: 16,
+        artists: [
+          'Azarel',
+          'Leor'
+        ],
+        audio_features: {
+          tempo: 184.058
+        }
+      },
+      {
+        _id: ObjectId('6b02fb1ea2c90c5e22634eb4'),
+        track_name: 'Freguês da Meia Noite (Instrumental)',
+        popularity: 15,
+        artists: [
+          'Criolo'
+        ],
+        audio_features: {
+          tempo: 175.949
+        }
+      },
+      {
+        _id: ObjectId('6b02fb1ea2c90c5e22634edf'),
+        track_name: 'Me Voy Pa’ Porce',
+        popularity: 16,
+        artists: [
+          'La Misa Negra'
+        ],
+        audio_features: {
+          tempo: 178.022
+        }
+      }
+    ],
+    genre: 'afrobeat',
+    avg_tempo: 119.2,
+    outlier_threshold: 171.8
+  },
+  {
+    outlier_tracks: [
+      {
+        _id: ObjectId('6b02fb1ea2c90c5e22634f31'),
+        track_name: 'Elliot’s Song - From "Euphoria" An HBO Original Series',
+        popularity: 1,
+        artists: [
+          'Dominic Fike',
+          'Zendaya'
+        ],
+        audio_features: {
+          tempo: 184.14
+        }
+      },
+      {
+        _id: ObjectId('6b02fb1ea2c90c5e22634f45'),
+        track_name: 'O Holy Night',
+        popularity: 0,
+        artists: [
+          'Weezer'
+        ],
+        audio_features: {
+          tempo: 197.819
+        }
+      },
+      {
+        _id: ObjectId('6b02fb1ea2c90c5e22634f46'),
+        track_name: 'My Name Is Jonas',
+        popularity: 1,
+        artists: [
+          'Weezer'
+        ],
+        audio_features: {
+          tempo: 185.942
+        }
+      },
+      {
+        _id: ObjectId('6b02fb1ea2c90c5e22634f4a'),
+        track_name: "It's The End Of The World As We Know It (And I Feel Fine)",
+        popularity: 0,
+        artists: [
+          'R.E.M.'
+        ],
+        audio_features: {
+          tempo: 205.528
+        }
+      },
+      {
+        _id: ObjectId('6b02fb1ea2c90c5e22634f4d'),
+        track_name: "It's The End Of The World As We Know It (And I Feel Fine)",
+        popularity: 0,
+        artists: [
+          'R.E.M.'
+        ],
+        audio_features: {
+          tempo: 205.528
+        }
+      },
+      {
+        _id: ObjectId('6b02fb1ea2c90c5e22634fb3'),
+        track_name: 'Sweet Dreams (Are Made Of This)',
+        popularity: 2,
+        artists: [
+          'Marilyn Manson'
+        ],
+        audio_features: {
+          tempo: 186.044
+        }
+      },
+      {
+        _id: ObjectId('6b02fb1ea2c90c5e22634fb4'),
+        track_name: 'Sweet Dreams (Are Made Of This)',
+        popularity: 0,
+        artists: [
+          'Marilyn Manson'
+        ],
+        audio_features: {
+          tempo: 186.044
+        }
+      },
+      {
+        _id: ObjectId('6b02fb1ea2c90c5e22634fb5'),
+        track_name: 'Sweet Dreams (Are Made Of This)',
+        popularity: 0,
+        artists: [
+          'Marilyn Manson'
+        ],
+        audio_features: {
+          tempo: 186.044
+        }
+      },
+      {
+        _id: ObjectId('6b02fb1ea2c90c5e22634fb6'),
+        track_name: 'Sweet Dreams (Are Made Of This)',
+        popularity: 0,
+        artists: [
+          'Marilyn Manson'
+        ],
+        audio_features: {
+          tempo: 186.044
+        }
+      },
+      {
+        _id: ObjectId('6b02fb1ea2c90c5e22634fb7'),
+        track_name: 'Sweet Dreams (Are Made Of This)',
+        popularity: 2,
+        artists: [
+          'Marilyn Manson'
+        ],
+        audio_features: {
+          tempo: 186.044
+        }
+      },
+      {
+        _id: ObjectId('6b02fb1ea2c90c5e22634fd8'),
+        track_name: 'Christmas Card',
+        popularity: 0,
+        artists: [
+          'Jimmy Eat World'
+        ],
+        audio_features: {
+          tempo: 194.319
+        }
+      },
+      {
+        _id: ObjectId('6b02fb1ea2c90c5e22634fe8'),
+        track_name: 'Spoonman',
+        popularity: 0,
+        artists: [
+          'Soundgarden'
+        ],
+        audio_features: {
+          tempo: 186.054
+        }
+      },
+      {
+        _id: ObjectId('6b02fb1ea2c90c5e22634ff9'),
+        track_name: 'Heart-Shaped Box',
+        popularity: 79,
+        artists: [
+          'Nirvana'
+        ],
+        audio_features: {
+          tempo: 203.006
+        }
+      },
+      {
+        _id: ObjectId('6b02fb1ea2c90c5e22635054'),
+        track_name: 'Unfair',
+        popularity: 72,
+        artists: [
+          'The Neighbourhood'
+        ],
+        audio_features: {
+          tempo: 194.033
+        }
+      },
+      {
+        _id: ObjectId('6b02fb1ea2c90c5e226350d4'),
+        track_name: 'Natural Born Killer',
+        popularity: 5,
+        artists: [
+          'Highly Suspect'
+        ],
+        audio_features: {
+          tempo: 194.876
+        }
+      },
+      {
+        _id: ObjectId('6b02fb1ea2c90c5e226350da'),
+        track_name: 'そういえば今日から化け物になった',
+        popularity: 0,
+        artists: [
+          'Creep Hyp'
+        ],
+        audio_features: {
+          tempo: 203.997
+        }
+      },
+      {
+        _id: ObjectId('6b02fb1ea2c90c5e226350f3'),
+        track_name: 'Never Tear Us Apart',
+        popularity: 59,
+        artists: [
+          'Bishop Briggs'
+        ],
+        audio_features: {
+          tempo: 188.96
+        }
+      },
+      {
+        _id: ObjectId('6b02fb1ea2c90c5e226350f6'),
+        track_name: 'Stronger',
+        popularity: 61,
+        artists: [
+          'The Score'
+        ],
+        audio_features: {
+          tempo: 191.883
+        }
+      },
+      {
+        _id: ObjectId('6b02fb1ea2c90c5e2263510e'),
+        track_name: 'El Ojo Blindado',
+        popularity: 50,
+        artists: [
+          'Sumo'
+        ],
+        audio_features: {
+          tempo: 194.458
+        }
+      },
+      {
+        _id: ObjectId('6b02fb1ea2c90c5e2263512e'),
+        track_name: 'Ella Debe Estar Tan Linda',
+        popularity: 48,
+        artists: [
+          'Patricio Rey y sus Redonditos de Ricota'
+        ],
+        audio_features: {
+          tempo: 205.911
+        }
+      },
+      {
+        _id: ObjectId('6b02fb1ea2c90c5e2263519f'),
+        track_name: 'Primavera',
+        popularity: 47,
+        artists: [
+          'Los Hermanos'
+        ],
+        audio_features: {
+          tempo: 200.332
+        }
+      },
+      {
+        _id: ObjectId('6b02fb1ea2c90c5e22635212'),
+        track_name: 'Eliza Mi Hortaliza',
+        popularity: 46,
+        artists: [
+          'Enjambre'
+        ],
+        audio_features: {
+          tempo: 193.04
+        }
+      },
+      {
+        _id: ObjectId('6b02fb1ea2c90c5e22635235'),
+        track_name: 'Camaleón - Remasterizado 2007',
+        popularity: 46,
+        artists: [
+          'Soda Stereo'
+        ],
+        audio_features: {
+          tempo: 195.93
+        }
+      },
+      {
+        _id: ObjectId('6b02fb1ea2c90c5e22635243'),
+        track_name: 'Escombro En La Ciudad',
+        popularity: 45,
+        artists: [
+          'La 25'
+        ],
+        audio_features: {
+          tempo: 190.073
+        }
+      },
+      {
+        _id: ObjectId('6b02fb1ea2c90c5e22635263'),
+        track_name: 'Laberintos',
+        popularity: 46,
+        artists: [
+          'División Minúscula'
+        ],
+        audio_features: {
+          tempo: 215.513
+        }
+      },
+      {
+        _id: ObjectId('6b02fb1ea2c90c5e22635280'),
+        track_name: 'Time of Dying',
+        popularity: 66,
+        artists: [
+          'Three Days Grace'
+        ],
+        audio_features: {
+          tempo: 198.387
+        }
+      }
+    ],
+    genre: 'alt-rock',
+    avg_tempo: 124.6,
+    outlier_threshold: 183.1
+  }
+]
+
+Повний результат завдання 3 збережено в колекцію tempo_outliers:
+Жанрів з викидами: 112
+Усього треків-викидів: 3506
+Перегляд: db.tempo_outliers.find().sort({genre:1})
+
+========================================================
+Завдання 4. Фонова музика: тихі, інструментальні, без explicit
+========================================================
+>>> ЗАПИТ:
+db.tracks.find(
+{
+  'audio_features.loudness': {
+    '$lt': -10
+  },
+  'audio_features.speechiness': {
+    '$lt': 0.1
+  },
+  'audio_features.instrumentalness': {
+    '$gt': 0.5
+  },
+  explicit: false
 }
 , 
 {
   _id: 0,
   track_name: 1,
   artists: 1,
-  explicit: 1,
-  popularity: 1,
-  'audio_features.instrumentalness': 1
+  'audio_features.loudness': 1,
+  'audio_features.speechiness': 1,
+  'audio_features.instrumentalness': 1,
+  explicit: 1
 }
 )
-.limit(3)
+.sort(
+{
+  popularity: -1
+}
+)
+.limit(5)
 
 >>> РЕЗУЛЬТАТ:
-Кількість (countDocuments): 19727
+Кількість (countDocuments): 9324
 [
   {
-    track_name: 'And I Love Her',
-    popularity: 66,
+    track_name: 'everything i wanted',
     explicit: false,
     artists: [
-      'Kurt Cobain'
+      'Billie Eilish'
     ],
     audio_features: {
-      instrumentalness: 0.833
+      loudness: -14.454,
+      speechiness: 0.0994,
+      instrumentalness: 0.657
     }
   },
   {
-    track_name: 'Chi Mai',
-    popularity: 40,
+    track_name: 'Clean White Noise - Loopable with no fade',
     explicit: false,
     artists: [
-      'Joseph Sullinger'
+      'White Noise Baby Sleep',
+      'White Noise for Babies'
     ],
     audio_features: {
+      loudness: -28.46,
+      speechiness: 0,
+      instrumentalness: 1
+    }
+  },
+  {
+    track_name: 'Show Me How',
+    explicit: false,
+    artists: [
+      'Men I Trust'
+    ],
+    audio_features: {
+      loudness: -11.997,
+      speechiness: 0.0415,
+      instrumentalness: 0.534
+    }
+  },
+  {
+    track_name: 'Show Me How',
+    explicit: false,
+    artists: [
+      'Men I Trust'
+    ],
+    audio_features: {
+      loudness: -11.997,
+      speechiness: 0.0415,
+      instrumentalness: 0.534
+    }
+  },
+  {
+    track_name: 'Experience',
+    explicit: false,
+    artists: [
+      'Ludovico Einaudi',
+      'Daniel Hope',
+      'I Virtuosi Italiani'
+    ],
+    audio_features: {
+      loudness: -10.634,
+      speechiness: 0.0376,
       instrumentalness: 0.961
     }
-  },
-  {
-    track_name: 'Mujer con Abanico',
-    popularity: 41,
-    explicit: false,
-    artists: [
-      'Agustín Amigó',
-      'Nylonwings'
-    ],
-    audio_features: {
-      instrumentalness: 0.905
-    }
   }
 ]
 
-========================================================
-2.8. $regex: назва починається з 'love', valence > 0.7
-========================================================
->>> ЗАПИТ:
-db.tracks.find(
-{
-  track_name: {
-    '$regex': /^love/i
-  },
-  'audio_features.valence': {
-    '$gt': 0.7
-  }
-}
-, 
-{
-  _id: 0,
-  track_name: 1,
-  artists: 1,
-  popularity: 1,
-  'audio_features.valence': 1
-}
-)
-.sort(
-{
-  popularity: -1
-}
-)
-.limit(3)
-
->>> РЕЗУЛЬТАТ:
-Кількість (countDocuments): 143
-[
-  {
-    track_name: 'Love You Like A Love Song',
-    popularity: 81,
-    artists: [
-      'Selena Gomez & The Scene'
-    ],
-    audio_features: {
-      valence: 0.922
-    }
-  },
-  {
-    track_name: 'Lovely Day',
-    popularity: 76,
-    artists: [
-      'Bill Withers'
-    ],
-    audio_features: {
-      valence: 0.706
-    }
-  },
-  {
-    track_name: 'Lovely Day',
-    popularity: 76,
-    artists: [
-      'Bill Withers'
-    ],
-    audio_features: {
-      valence: 0.706
-    }
-  }
-]
-
-========================================================
-2.9. tier='high', explicit != true, жанр не з [pop, k-pop]
-========================================================
->>> ЗАПИТ:
-db.tracks.find(
-{
-  popularity_tier: 'high',
-  explicit: {
-    '$ne': true
-  },
-  track_genre: {
-    '$nin': [
-      'pop',
-      'k-pop'
-    ]
-  }
-}
-, 
-{
-  _id: 0,
-  track_name: 1,
-  artists: 1,
-  track_genre: 1,
-  popularity: 1
-}
-)
-.sort(
-{
-  popularity: -1
-}
-)
-.limit(3)
-
->>> РЕЗУЛЬТАТ:
-Кількість (countDocuments): 4103
-[
-  {
-    track_name: 'Unholy (feat. Kim Petras)',
-    popularity: 100,
-    track_genre: 'dance',
-    artists: [
-      'Sam Smith',
-      'Kim Petras'
-    ]
-  },
-  {
-    track_name: 'Quevedo: Bzrp Music Sessions, Vol. 52',
-    popularity: 99,
-    track_genre: 'hip-hop',
-    artists: [
-      'Bizarrap',
-      'Quevedo'
-    ]
-  },
-  {
-    track_name: 'La Bachata',
-    popularity: 98,
-    track_genre: 'latin',
-    artists: [
-      'Manuel Turizo'
-    ]
-  }
-]
-
-Усі запити частини 2 виконано.
+Усі завдання частини 2 виконано.

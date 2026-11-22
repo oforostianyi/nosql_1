@@ -5,79 +5,200 @@
 Індекси tracks: ["_id_"]
 
 ========================================================
-Крок 1. explain() БЕЗ індексів
+Завдання 1. genre='pop' + danceability>=0.7, sort popularity desc
 ========================================================
->>> ЗАПИТ: A: genre='pop' AND popularity>=70 (sort popularity desc)
-db.tracks.find(
+>>> ЗАПИТ: db.tracks.find(
+{
+  track_genre: 'pop',
+  'audio_features.danceability': {
+    '$gte': 0.7
+  }
+}
+
+).sort(
+{
+  popularity: -1
+}
+)
+
+--- explain() БЕЗ індексу:
+{
+  label: 'task1 before',
+  stages: 'SORT → COLLSCAN',
+  executionTimeMillis: 72,
+  totalKeysExamined: 0,
+  totalDocsExamined: 113999,
+  nReturned: 354
+}
+
+>>> ЗАПИТ: db.tracks.createIndex(
+{
+  track_genre: 1,
+  popularity: -1,
+  'audio_features.danceability': 1
+}
+, { name: "idx_genre_pop_dance" })
+Створено: idx_genre_pop_dance
+
+--- explain() ПІСЛЯ індексу:
+{
+  label: 'task1 after',
+  stages: 'FETCH → IXSCAN',
+  executionTimeMillis: 2,
+  totalKeysExamined: 412,
+  totalDocsExamined: 354,
+  nReturned: 354
+}
+
+--- Порівняння:
+  stages:        SORT → COLLSCAN  →  FETCH → IXSCAN
+  час (мс):      72  →  2
+  docsExamined:  113999  →  354
+  keysExamined:  0  →  412
+  nReturned:     354  →  354
+
+========================================================
+Завдання 2. Індекс для work-music: explicit + instrumentalness + speechiness
+========================================================
+>>> ЗАПИТ: db.tracks.find(
+{
+  explicit: false,
+  'audio_features.instrumentalness': {
+    '$gt': 0.5
+  },
+  'audio_features.speechiness': {
+    '$lt': 0.1
+  }
+}
+
+)
+
+--- explain() БЕЗ індексу:
+{
+  label: 'task2 before',
+  stages: 'COLLSCAN',
+  executionTimeMillis: 124,
+  totalKeysExamined: 0,
+  totalDocsExamined: 113999,
+  nReturned: 16141
+}
+
+>>> ЗАПИТ: db.tracks.createIndex(
+{
+  explicit: 1,
+  'audio_features.instrumentalness': 1,
+  'audio_features.speechiness': 1
+}
+, { name: "idx_work_music" })
+Створено: idx_work_music
+
+--- explain() ПІСЛЯ індексу:
+{
+  label: 'task2 after',
+  stages: 'FETCH → IXSCAN',
+  executionTimeMillis: 37,
+  totalKeysExamined: 16602,
+  totalDocsExamined: 16141,
+  nReturned: 16141
+}
+
+--- Порівняння:
+  stages:        COLLSCAN  →  FETCH → IXSCAN
+  час (мс):      124  →  37
+  docsExamined:  113999  →  16141
+  keysExamined:  0  →  16602
+  nReturned:     16141  →  16141
+
+========================================================
+Завдання 3. Чи є запит покривним (covered query)?
+========================================================
+Варіант А — як у умові, БЕЗ проєкції (повертається весь документ):
+>>> ЗАПИТ: db.tracks.find(
 {
   track_genre: 'pop',
   popularity: {
     '$gte': 70
   }
 }
-).sort(
-{
-  popularity: -1
-}
-).explain("executionStats")
 
->>> ЗАПИТ: B: artists='Bad Bunny' (multikey)
-db.tracks.find(
+)
+{
+  label: 'task3 without projection',
+  stages: 'FETCH → IXSCAN',
+  executionTimeMillis: 0,
+  totalKeysExamined: 317,
+  totalDocsExamined: 317,
+  nReturned: 317
+}
+
+Варіант Б — проєкція лише полів індексу, _id виключено:
+>>> ЗАПИТ: db.tracks.find(
+{
+  track_genre: 'pop',
+  popularity: {
+    '$gte': 70
+  }
+}
+, 
+{
+  _id: 0,
+  track_genre: 1,
+  popularity: 1
+}
+)
+{
+  label: 'task3 covered projection',
+  stages: 'PROJECTION_COVERED → IXSCAN',
+  executionTimeMillis: 0,
+  totalKeysExamined: 317,
+  totalDocsExamined: 0,
+  nReturned: 317
+}
+
+Висновок: без проєкції — NOT covered (FETCH, docsExamined=317);
+з проєкцією {_id:0, track_genre:1, popularity:1} — covered (PROJECTION_COVERED, docsExamined=0).
+
+========================================================
+Бонус. Multikey: artists='Bad Bunny'
+========================================================
+>>> ЗАПИТ: db.tracks.find(
 {
   artists: 'Bad Bunny'
 }
-).sort(
-{}
-).explain("executionStats")
 
->>> ЗАПИТ: C: energy>0.9 AND danceability>0.8 (вкладені поля)
-db.tracks.find(
-{
-  'audio_features.energy': {
-    '$gt': 0.9
-  },
-  'audio_features.danceability': {
-    '$gt': 0.8
-  }
-}
-).sort(
-{}
-).explain("executionStats")
+)
 
+--- explain() БЕЗ індексу:
 {
-  label: "A: genre='pop' AND popularity>=70 (sort popularity desc)",
-  scan: 'COLLSCAN',
-  executionTimeMillis: 71,
-  totalKeysExamined: 0,
-  totalDocsExamined: 113999,
-  nReturned: 317
-}
-{
-  label: "B: artists='Bad Bunny' (multikey)",
-  scan: 'COLLSCAN',
-  executionTimeMillis: 83,
+  label: 'bonus before',
+  stages: 'COLLSCAN',
+  executionTimeMillis: 82,
   totalKeysExamined: 0,
   totalDocsExamined: 113999,
   nReturned: 416
 }
+
+>>> ЗАПИТ: db.tracks.createIndex({ artists: 1 }, { name: 'idx_artists_multikey' })
+Створено: idx_artists_multikey
+
+--- explain() ПІСЛЯ індексу:
 {
-  label: 'C: energy>0.9 AND danceability>0.8 (вкладені поля)',
-  scan: 'COLLSCAN',
-  executionTimeMillis: 80,
-  totalKeysExamined: 0,
-  totalDocsExamined: 113999,
-  nReturned: 427
+  label: 'bonus after',
+  stages: 'FETCH → IXSCAN',
+  executionTimeMillis: 2,
+  totalKeysExamined: 416,
+  totalDocsExamined: 416,
+  nReturned: 416
 }
 
+--- Порівняння:
+  stages:        COLLSCAN  →  FETCH → IXSCAN
+  час (мс):      82  →  2
+  docsExamined:  113999  →  416
+
 ========================================================
-Крок 2. Створення індексів
+Підсумок: індекси колекції tracks
 ========================================================
->>> ЗАПИТ: db.tracks.createIndex({"track_genre":1,"popularity":-1}, { name: "idx_genre_popularity" })
-Створено: idx_genre_popularity
->>> ЗАПИТ: db.tracks.createIndex({"artists":1}, { name: "idx_artists_multikey" })
-Створено: idx_artists_multikey
->>> ЗАПИТ: db.tracks.createIndex({"audio_features.energy":1,"audio_features.danceability":1}, { name: "idx_energy_danceability" })
-Створено: idx_energy_danceability
 [
   {
     name: '_id_',
@@ -86,10 +207,19 @@ db.tracks.find(
     }
   },
   {
-    name: 'idx_genre_popularity',
+    name: 'idx_genre_pop_dance',
     key: {
       track_genre: 1,
-      popularity: -1
+      popularity: -1,
+      'audio_features.danceability': 1
+    }
+  },
+  {
+    name: 'idx_work_music',
+    key: {
+      explicit: 1,
+      'audio_features.instrumentalness': 1,
+      'audio_features.speechiness': 1
     }
   },
   {
@@ -97,66 +227,7 @@ db.tracks.find(
     key: {
       artists: 1
     }
-  },
-  {
-    name: 'idx_energy_danceability',
-    key: {
-      'audio_features.energy': 1,
-      'audio_features.danceability': 1
-    }
   }
 ]
 
-========================================================
-Крок 3. explain() ПІСЛЯ індексів
-========================================================
-{
-  label: "A: genre='pop' AND popularity>=70 (sort popularity desc)",
-  scan: 'IXSCAN',
-  executionTimeMillis: 1,
-  totalKeysExamined: 317,
-  totalDocsExamined: 317,
-  nReturned: 317
-}
-{
-  label: "B: artists='Bad Bunny' (multikey)",
-  scan: 'IXSCAN',
-  executionTimeMillis: 2,
-  totalKeysExamined: 416,
-  totalDocsExamined: 416,
-  nReturned: 416
-}
-{
-  label: 'C: energy>0.9 AND danceability>0.8 (вкладені поля)',
-  scan: 'IXSCAN',
-  executionTimeMillis: 4,
-  totalKeysExamined: 527,
-  totalDocsExamined: 427,
-  nReturned: 427
-}
-
-========================================================
-Крок 4. Порівняння ДО / ПІСЛЯ
-========================================================
-A: genre='pop' AND popularity>=70 (sort popularity desc)
-  scan:          COLLSCAN  →  IXSCAN
-  час (мс):      71  →  1
-  docsExamined:  113999  →  317
-  keysExamined:  0  →  317
-  nReturned:     317  →  317
-
-B: artists='Bad Bunny' (multikey)
-  scan:          COLLSCAN  →  IXSCAN
-  час (мс):      83  →  2
-  docsExamined:  113999  →  416
-  keysExamined:  0  →  416
-  nReturned:     416  →  416
-
-C: energy>0.9 AND danceability>0.8 (вкладені поля)
-  scan:          COLLSCAN  →  IXSCAN
-  час (мс):      80  →  4
-  docsExamined:  113999  →  427
-  keysExamined:  0  →  527
-  nReturned:     427  →  427
-
-Профілювання завершено.
+Частину 3 виконано.

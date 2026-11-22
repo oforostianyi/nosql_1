@@ -116,25 +116,66 @@ mongosh "$MONGO_URI" --file queries/part3_indexes.js
 | Сольні / колаборації | `{artists: {$size: 1}}`, `$expr: {$gte: [{$size: "$artists"}, 3]}` | підрахунок роздільників у `$expr` |
 | Аналітика по виконавцях | `$unwind: "$artists"` → `$group` | попередній `$split` у кожному пайплайні |
 
-Практичний ефект підтверджено у `part3_indexes.js`: запит `{artists: "Bad Bunny"}` з multikey-індексом виконується за **2 мс проти 83 мс** і читає **416 документів замість 113 999**.
+Практичний ефект підтверджено у `part3_indexes.js`: запит `{artists: "Bad Bunny"}` з multikey-індексом виконується за **2 мс проти 82 мс** і читає **416 документів замість 113 999**.
 
 ## Частина 2 — Запити (`queries/part2_queries.js`)
 
-Повний вивід: `results/part2_output.txt` — для кожного пункту надруковано **повний запит** (`db.tracks.find(filter, projection).sort(...).limit(...)`) і одразу результат.
+Повний вивід: `results/part2_output.txt` — для кожного завдання надруковано **повний запит/пайплайн** і одразу результат.
 
-| # | Запит | Оператори | Результат |
+### Завдання 1. Треки для вечірки
+
+Фільтр: `audio_features.danceability > 0.7`, `audio_features.energy > 0.7`, `duration_ms ∈ [180000, 300000]` (3–5 хв).
+
+```javascript
+db.tracks.find({
+  "audio_features.danceability": { $gt: 0.7 },
+  "audio_features.energy": { $gt: 0.7 },
+  duration_ms: { $gte: 180000, $lte: 300000 }
+}).sort({ popularity: -1 })
+```
+
+**Результат: 7 311 треків.** У топі за популярністю — `Quevedo: Bzrp Music Sessions, Vol. 52` (99), `Me Porto Bonito` (97).
+
+### Завдання 2. Виконавці, у яких усі треки популярні
+
+Агрегація: `$unwind: "$artists"` (колаборація зараховується кожному виконавцю) → `$group` по виконавцю з `track_count`, `min_popularity`, `avg_popularity` → `$match: { track_count: { $gte: 3 }, min_popularity: { $gte: 60 } }` → `$round` avg до 1 знака → `$sort` за avg → `$limit: 20`.
+
+Ключова ідея: «усі треки популярні» ⇔ **мінімум** популярності ≥ 60 — тому фільтруємо за `$min`, а не за середнім.
+
+**Результат: топ-20.** Перші місця:
+
+| Артист | Треків | min | avg |
 |---|---|---|---|
-| 2.1 | Енергійні танцювальні треки | dot notation, `$gt` по вкладених полях | 7 066 |
-| 2.2 | tempo 120–140, popularity ≥ 60, 180–240 с | `$gte`/`$lte` (діапазони) | 1 741 |
-| 2.3 | Треки за участю Bad Bunny | збіг елемента масиву | 416 |
-| 2.4 | Спільні роботи Daddy Yankee + Bad Bunny | `$all` | 88 |
-| 2.5 | Сольні / з 3+ виконавцями | `$size`, `$expr` | 83 924 / 8 963 |
-| 2.6 | Bruno Mars або Silk Sonic | `$in` | 90 |
-| 2.7 | popular explicit OR instrumental | `$or`, `$and`, `$gt` | 19 727 |
-| 2.8 | Назва на "love", valence > 0.7 | `$regex`, `$gt` | 143 |
-| 2.9 | high tier, не explicit, не pop/k-pop | `$ne`, `$nin` | 4 103 |
+| Harry Styles | 3 | 89 | 92.0 |
+| Luar La L | 4 | 90 | 90.5 |
+| Olivia Rodrigo | 5 | 86 | 87.4 |
+| BYOR | 4 | 87 | 87.0 |
+| IVE | 3 | 79 | 84.0 |
 
-## Частина 3 — Аналітика (`queries/part3_analytics.js`)
+### Завдання 3. Нетипові треки (темпо-викиди по жанрах)
+
+Пайплайн: `$group` по `track_genre` з `$avg`/`$stdDevPop` темпу і `$push` треків жанру → `$addFields: outlier_threshold = avg + 2*stdDev` → `$filter` масиву треків за умовою `tempo > threshold` → `$match` непорожніх → `$project` форми `{genre, avg_tempo, outlier_threshold, outlier_tracks[]}`.
+
+**Результат: 112 жанрів із викидами, загалом 3 506 треків** (≈3% — узгоджується з правилом 2σ для нормального розподілу). Приклад для `acoustic`: `avg_tempo: 119`, `outlier_threshold: 178.5`, викиди — `Breaco` (Criolo, 182.0 BPM), `Tengo Luquita` (Juanafé, 176.3 BPM)…
+
+У консоль виводяться 3 приклади; **повний результат збережено в колекцію `spotify.tempo_outliers`** (`$merge`) — перегляд: `db.tempo_outliers.find().sort({genre: 1})`.
+
+### Завдання 4. Треки для фонової роботи
+
+```javascript
+db.tracks.find({
+  "audio_features.loudness": { $lt: -10 },
+  "audio_features.speechiness": { $lt: 0.1 },
+  "audio_features.instrumentalness": { $gt: 0.5 },
+  explicit: false
+}).sort({ popularity: -1 })
+```
+
+**Результат: 9 324 треки.** Саме цей патерн запиту оптимізовано складеним індексом у частині 3 (завдання 2).
+
+## Додаткова аналітика (`queries/part3_analytics.js`)
+
+Реалізує пункт 3 «Ходу роботи»: багатоетапні агрегації з `$lookup` та `$unwind` (понад обов'язкові завдання).
 
 Повний вивід: `results/part3_analytics_output.txt` — кожен пайплайн надруковано **повністю** (`db.tracks.aggregate([...])`) перед результатом.
 
@@ -154,25 +195,111 @@ mongosh "$MONGO_URI" --file queries/part3_indexes.js
 
 **3.5. `$bucket` по energy** — середня популярність майже не залежить від енергійності (28.9 → 35.4 → 31.8 по бакетах): гіпотеза «енергійні треки популярніші» не підтверджується; максимум у діапазоні 0.4–0.6.
 
-## Частина 3 — Індекси та explain() (`queries/part3_indexes.js`)
+## Частина 3 — Індекси та оптимізація (`queries/part3_indexes.js`)
 
-Повний вивід: `results/part3_indexes_output.txt` (містить повні filter/sort кожного тестового запиту та команди `createIndex`). Методика: `explain("executionStats")` до індексу → `createIndex` → той самий explain після.
+Повний вивід: `results/part3_indexes_output.txt` (повні filter/sort кожного запиту, команди `createIndex`, ключові поля `explain("executionStats")` до/після). Методика: explain без індексу → `createIndex` → той самий explain.
 
-Створені індекси:
-- `idx_genre_popularity` — `{track_genre: 1, popularity: -1}` (compound, підтримує і фільтр, і сортування)
-- `idx_artists_multikey` — `{artists: 1}` (multikey по масиву)
-- `idx_energy_danceability` — `{"audio_features.energy": 1, "audio_features.danceability": 1}` (compound по вкладених полях)
+### Завдання 1. Аналіз запиту та індексація
 
-| Запит | План | Час, мс | docsExamined | keysExamined | nReturned |
-|---|---|---|---|---|---|
-| A: `genre='pop' ∧ popularity≥70`, sort | COLLSCAN → IXSCAN | **71 → 1** | 113 999 → 317 | 0 → 317 | 317 |
-| B: `artists='Bad Bunny'` | COLLSCAN → IXSCAN | **83 → 2** | 113 999 → 416 | 0 → 416 | 416 |
-| C: `energy>0.9 ∧ danceability>0.8` | COLLSCAN → IXSCAN | **80 → 4** | 113 999 → 427 | 0 → 527 | 427 |
+Запит з умови:
 
-Висновки:
-- Ефект доведено об'єктивно: **~40–90× швидше**, замість 113 999 документів читається лише потрібні (~360× менше I/O).
-- Для запиту A `keysExamined == nReturned` — compound-індекс ідеальний: рівність по `track_genre` + діапазон і сортування по `popularity` (правило ESR: Equality → Sort → Range).
-- Для C `keysExamined (527) > nReturned (427)` — друге поле compound-індексу після range-умови не може звузити скан ідеально, але це все одно на 2 порядки краще за COLLSCAN.
+```javascript
+db.tracks.find({
+  track_genre: "pop",
+  "audio_features.danceability": { $gte: 0.7 }
+}).sort({ popularity: -1 }).toArray();
+```
+
+Створений індекс — за правилом **ESR (Equality → Sort → Range)**:
+
+```javascript
+db.tracks.createIndex(
+  { track_genre: 1, popularity: -1, "audio_features.danceability": 1 },
+  { name: "idx_genre_pop_dance" }
+)
+```
+
+- **Equality**: `track_genre: 1` — точний збіг звужує скан до одного жанру;
+- **Sort**: `popularity: -1` — індекс уже впорядкований, сервер віддає документи одразу в потрібному порядку;
+- **Range**: `danceability: 1` — діапазонна умова перевіряється по ключах індексу.
+
+**Що змінилося в плані виконання** (поля з explain):
+
+| Поле | ДО | ПІСЛЯ |
+|---|---|---|
+| stages | `SORT → COLLSCAN` | `FETCH → IXSCAN` |
+| executionTimeMillis | 72 | **2** |
+| totalDocsExamined | 113 999 | **354** |
+| totalKeysExamined | 0 | 412 |
+| nReturned | 354 | 354 |
+
+1. Було: повне сканування колекції (**COLLSCAN**, 113 999 документів) + **блокуюче сортування SORT** у пам'яті. Стає: **IXSCAN** по `idx_genre_pop_dance` + FETCH лише 354 потрібних документів.
+2. **Стадія SORT зникла з плану** — сортування виконує сам індекс (порядок ключів `popularity: -1`), пам'ять на sort не витрачається.
+3. `keysExamined (412) > nReturned (354)`: 58 ключів жанру `pop` відсіяно за діапазоном danceability ще на рівні індексу — документи для них не читалися.
+
+**Як зрозуміти, що індекс використовується:** у `explain()` стадія сканування — `IXSCAN` (а не `COLLSCAN`), з'являється `keyPattern: {track_genre: 1, popularity: -1, "audio_features.danceability": 1}` та `indexName: "idx_genre_pop_dance"`; `totalKeysExamined > 0`; відсутня стадія `SORT`. Значення полів наведено в таблиці вище та у `results/part3_indexes_output.txt`.
+
+### Завдання 2. Індекс для «музики для роботи»
+
+```javascript
+db.tracks.createIndex(
+  { explicit: 1, "audio_features.instrumentalness": 1, "audio_features.speechiness": 1 },
+  { name: "idx_work_music" }
+)
+```
+
+Порядок полів обґрунтовано: `explicit` — умова **рівності** (`false`), тому перше (E з ESR); далі найбільш селективний діапазон `instrumentalness > 0.5`, потім `speechiness < 0.1`.
+
+Explain запиту `{explicit: false, instrumentalness: {$gt: 0.5}, speechiness: {$lt: 0.1}}`:
+
+| Поле | ДО | ПІСЛЯ |
+|---|---|---|
+| stages | `COLLSCAN` | `FETCH → IXSCAN` |
+| executionTimeMillis | 124 | **37** |
+| totalDocsExamined | 113 999 | **16 141** |
+| totalKeysExamined | 0 | 16 602 |
+| nReturned | 16 141 | 16 141 |
+
+Індекс використовується (`IXSCAN`, `indexName: "idx_work_music"`): читання документів скоротилося у 7 разів, час — у 3.4 раза. Приріст скромніший, ніж у завданні 1, бо запит повертає 14% колекції — індекси найвигідніші для селективних запитів.
+
+### Завдання 3 (факультативне). Чи є запит покривним?
+
+```javascript
+db.tracks.find({ track_genre: "pop", popularity: { $gte: 70 } });
+// індекс: { track_genre: 1, popularity: -1, "audio_features.danceability": 1 }
+```
+
+**Відповідь: у такому вигляді — НІ, не є covered.** Обґрунтування:
+
+1. Covered query — це коли сервер відповідає **лише з ключів індексу**, не читаючи документи (FETCH). Для цього *всі* поля, які повертаються, мають бути в індексі.
+2. Запит без проєкції повертає **весь документ**: `track_name`, `artists`, `audio_features`, `duration_sec`… — жодного з цих полів в індексі немає → потрібен FETCH.
+3. Навіть якби проєкція обмежувалась полями індексу, за замовчуванням повертається ще й `_id`, якого в цьому індексі немає → все одно не covered, доки не вказати `_id: 0`.
+
+Експериментальне підтвердження (обидва explain — у `results/part3_indexes_output.txt`):
+
+| Варіант | stages | totalDocsExamined | totalKeysExamined |
+|---|---|---|---|
+| А: без проєкції (як в умові) | `FETCH → IXSCAN` | **317** | 317 |
+| Б: `{_id: 0, track_genre: 1, popularity: 1}` | `PROJECTION_COVERED → IXSCAN` | **0** | 317 |
+
+Варіант Б уже **є covered**: проєкція містить лише поля індексу й виключає `_id`, стадія — `PROJECTION_COVERED`, `totalDocsExamined = 0` — жоден документ не прочитано, відповідь зібрана з 317 ключів.
+
+### Бонус. Multikey-індекс по масиву виконавців
+
+`db.tracks.createIndex({artists: 1}, {name: "idx_artists_multikey"})`; запит `{artists: "Bad Bunny"}`:
+`COLLSCAN → FETCH → IXSCAN`, **82 → 2 мс**, docsExamined **113 999 → 416**, keysExamined 416 = nReturned — ідеальний збіг.
+
+### Підсумкові індекси колекції tracks
+
+| Ім'я | Ключ | Призначення |
+|---|---|---|
+| `idx_genre_pop_dance` | `{track_genre: 1, popularity: -1, "audio_features.danceability": 1}` | завдання 1 + covered-проєкції |
+| `idx_work_music` | `{explicit: 1, "audio_features.instrumentalness": 1, "audio_features.speechiness": 1}` | завдання 2 / запит 2.4 |
+| `idx_artists_multikey` | `{artists: 1}` | пошук за виконавцем (масив) |
+
+## Якість даних: дублікати в датасеті
+
+У `tracks` 113 999 документів, але лише **89 740 унікальних `track_id`**: датасет семплений по жанрах (~1000 треків на жанр), тож крос-жанрові треки присутні в кожному своєму жанрі (16 641 задубльованих id, 24 259 «зайвих» документів). Приклад: «Ferrari» (`4zN21mbAuaD0WqtmaTZZeP`) — 4 копії в `dance`, `deep-house`, `groove`, `house`. Це властивість вихідних даних, не помилка завантаження. Жанрові звіти коректні; глобальні метрики дещо зважені на користь крос-жанрових хітів. За потреби дублікати згортаються в масив жанрів через `$group: {_id: "$track_id", track_genre: {$addToSet: "$track_genre"}}`.
 
 ## Примітки
 
