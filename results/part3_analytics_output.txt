@@ -1,0 +1,346 @@
+
+========================================================
+3.1. Топ-10 жанрів за середньою популярністю (мін. 100 треків)
+========================================================
+[
+  {
+    _id: 'pop-film',
+    track_count: 1000,
+    avg_popularity: 59.3,
+    avg_energy: 0.605,
+    avg_danceability: 0.597,
+    hit_rate_pct: 6.7
+  },
+  {
+    _id: 'k-pop',
+    track_count: 999,
+    avg_popularity: 57,
+    avg_energy: 0.676,
+    avg_danceability: 0.648,
+    hit_rate_pct: 22.5
+  },
+  {
+    _id: 'chill',
+    track_count: 1000,
+    avg_popularity: 53.7,
+    avg_energy: 0.427,
+    avg_danceability: 0.664,
+    hit_rate_pct: 4.6
+  },
+  {
+    _id: 'sad',
+    track_count: 1000,
+    avg_popularity: 52.4,
+    avg_energy: 0.462,
+    avg_danceability: 0.692,
+    hit_rate_pct: 2.9
+  },
+  {
+    _id: 'grunge',
+    track_count: 1000,
+    avg_popularity: 49.6,
+    avg_energy: 0.803,
+    avg_danceability: 0.457,
+    hit_rate_pct: 9.3
+  },
+  {
+    _id: 'indian',
+    track_count: 1000,
+    avg_popularity: 49.5,
+    avg_energy: 0.567,
+    avg_danceability: 0.592,
+    hit_rate_pct: 2.8
+  },
+  {
+    _id: 'anime',
+    track_count: 1000,
+    avg_popularity: 48.8,
+    avg_energy: 0.674,
+    avg_danceability: 0.537,
+    hit_rate_pct: 2.4
+  },
+  {
+    _id: 'emo',
+    track_count: 1000,
+    avg_popularity: 48.1,
+    avg_energy: 0.67,
+    avg_danceability: 0.599,
+    hit_rate_pct: 7.8
+  },
+  {
+    _id: 'sertanejo',
+    track_count: 1000,
+    avg_popularity: 47.9,
+    avg_energy: 0.71,
+    avg_danceability: 0.592,
+    hit_rate_pct: 0
+  },
+  {
+    _id: 'pop',
+    track_count: 1000,
+    avg_popularity: 47.6,
+    avg_energy: 0.606,
+    avg_danceability: 0.63,
+    hit_rate_pct: 31.7
+  }
+]
+
+========================================================
+3.2. Розподіл за popularity_tier (з % від усієї колекції)
+========================================================
+[
+  {
+    _id: 'high',
+    count: 5472,
+    avg_popularity: 75.9,
+    share_pct: 4.8
+  },
+  {
+    _id: 'medium',
+    count: 43115,
+    avg_popularity: 52,
+    share_pct: 37.82
+  },
+  {
+    _id: 'low',
+    count: 65412,
+    avg_popularity: 17.3,
+    share_pct: 57.38
+  }
+]
+
+========================================================
+3.3. Топ-15 виконавців (мін. 10 треків) → збережено в artist_stats
+========================================================
+artist_stats документів: 3527
+[
+  {
+    _id: 'Måneskin',
+    track_count: 12,
+    avg_popularity: 83.7,
+    max_popularity: 86,
+    avg_energy: 0.725
+  },
+  {
+    _id: 'Lil Nas X',
+    track_count: 11,
+    avg_popularity: 83.5,
+    max_popularity: 90,
+    avg_energy: 0.652
+  },
+  {
+    _id: 'ROSALÍA',
+    track_count: 11,
+    avg_popularity: 77.1,
+    max_popularity: 83,
+    avg_energy: 0.701
+  },
+  {
+    _id: 'Radiohead',
+    track_count: 20,
+    avg_popularity: 76.7,
+    max_popularity: 85,
+    avg_energy: 0.436
+  },
+  {
+    _id: 'Regard',
+    track_count: 10,
+    avg_popularity: 76.1,
+    max_popularity: 81,
+    avg_energy: 0.749
+  },
+  {
+    _id: 'The Neighbourhood',
+    track_count: 60,
+    avg_popularity: 75.6,
+    max_popularity: 93,
+    avg_energy: 0.645
+  },
+  {
+    _id: 'System Of A Down',
+    track_count: 17,
+    avg_popularity: 74.5,
+    max_popularity: 83,
+    avg_energy: 0.881
+  },
+  {
+    _id: 'Lost Frequencies',
+    track_count: 10,
+    avg_popularity: 74.5,
+    max_popularity: 88,
+    avg_energy: 0.671
+  },
+  {
+    _id: 'Limp Bizkit',
+    track_count: 12,
+    avg_popularity: 74.3,
+    max_popularity: 77,
+    avg_energy: 0.787
+  },
+  {
+    _id: 'Frank Ocean',
+    track_count: 23,
+    avg_popularity: 74,
+    max_popularity: 85,
+    avg_energy: 0.467
+  },
+  {
+    _id: 'George Ezra',
+    track_count: 23,
+    avg_popularity: 73.6,
+    max_popularity: 79,
+    avg_energy: 0.672
+  },
+  {
+    _id: 'LISA',
+    track_count: 10,
+    avg_popularity: 73.5,
+    max_popularity: 78,
+    avg_energy: 0.761
+  },
+  {
+    _id: 'Earth, Wind & Fire',
+    track_count: 14,
+    avg_popularity: 72.8,
+    max_popularity: 83,
+    avg_energy: 0.749
+  },
+  {
+    _id: 'Travis Scott',
+    track_count: 31,
+    avg_popularity: 72.5,
+    max_popularity: 84,
+    avg_energy: 0.598
+  },
+  {
+    _id: 'TWICE',
+    track_count: 17,
+    avg_popularity: 72.5,
+    max_popularity: 86,
+    avg_energy: 0.87
+  }
+]
+
+========================================================
+3.4. $lookup: хіти (popularity>=90) + статистика виконавця
+========================================================
+[
+  {
+    track_name: 'Unholy (feat. Kim Petras)',
+    popularity: 100,
+    track_genre: 'pop',
+    artist: 'Kim Petras',
+    artist_avg_popularity: 19.1,
+    artist_track_count: 16
+  },
+  {
+    track_name: 'Unholy (feat. Kim Petras)',
+    popularity: 100,
+    track_genre: 'dance',
+    artist: 'Kim Petras',
+    artist_avg_popularity: 19.1,
+    artist_track_count: 16
+  },
+  {
+    track_name: 'Unholy (feat. Kim Petras)',
+    popularity: 100,
+    track_genre: 'pop',
+    artist: 'Sam Smith',
+    artist_avg_popularity: 15.5,
+    artist_track_count: 64
+  },
+  {
+    track_name: 'Unholy (feat. Kim Petras)',
+    popularity: 100,
+    track_genre: 'dance',
+    artist: 'Sam Smith',
+    artist_avg_popularity: 15.5,
+    artist_track_count: 64
+  },
+  {
+    track_name: 'La Bachata',
+    popularity: 98,
+    track_genre: 'latin',
+    artist: 'Manuel Turizo',
+    artist_avg_popularity: 29.8,
+    artist_track_count: 27
+  },
+  {
+    track_name: 'La Bachata',
+    popularity: 98,
+    track_genre: 'reggae',
+    artist: 'Manuel Turizo',
+    artist_avg_popularity: 29.8,
+    artist_track_count: 27
+  },
+  {
+    track_name: 'La Bachata',
+    popularity: 98,
+    track_genre: 'reggaeton',
+    artist: 'Manuel Turizo',
+    artist_avg_popularity: 29.8,
+    artist_track_count: 27
+  },
+  {
+    track_name: 'La Bachata',
+    popularity: 98,
+    track_genre: 'latino',
+    artist: 'Manuel Turizo',
+    artist_avg_popularity: 29.8,
+    artist_track_count: 27
+  },
+  {
+    track_name: "I'm Good (Blue)",
+    popularity: 98,
+    track_genre: 'dance',
+    artist: 'Bebe Rexha',
+    artist_avg_popularity: 25.2,
+    artist_track_count: 83
+  },
+  {
+    track_name: "I'm Good (Blue)",
+    popularity: 98,
+    track_genre: 'pop',
+    artist: 'Bebe Rexha',
+    artist_avg_popularity: 25.2,
+    artist_track_count: 83
+  }
+]
+
+========================================================
+3.5. $bucket: популярність за діапазонами energy
+========================================================
+[
+  {
+    _id: 0,
+    count: 7810,
+    avg_popularity: 28.9,
+    avg_valence: 0.232
+  },
+  {
+    _id: 0.2,
+    count: 13408,
+    avg_popularity: 32.3,
+    avg_valence: 0.373
+  },
+  {
+    _id: 0.4,
+    count: 23392,
+    avg_popularity: 35.4,
+    avg_valence: 0.466
+  },
+  {
+    _id: 0.6,
+    count: 31296,
+    avg_popularity: 34.8,
+    avg_valence: 0.542
+  },
+  {
+    _id: 0.8,
+    count: 38093,
+    avg_popularity: 31.8,
+    avg_valence: 0.508
+  }
+]
+
+Усі пайплайни частини 3 виконано.

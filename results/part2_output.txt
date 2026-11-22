@@ -1,0 +1,309 @@
+
+========================================================
+2.1. Вкладені поля: energy > 0.8 AND danceability > 0.7
+========================================================
+Кількість: 7066
+[
+  {
+    track_name: 'Kaleidoscope',
+    artists: [
+      'A Great Big World'
+    ],
+    audio_features: {
+      danceability: 0.709,
+      energy: 0.913
+    }
+  },
+  {
+    track_name: 'アジアの純真',
+    artists: [
+      'Yosui Inoue',
+      'Tamio Okuda'
+    ],
+    audio_features: {
+      danceability: 0.732,
+      energy: 0.83
+    }
+  },
+  {
+    track_name: 'Rocksteady',
+    artists: [
+      'Marc Broussard'
+    ],
+    audio_features: {
+      danceability: 0.719,
+      energy: 0.849
+    }
+  }
+]
+
+========================================================
+2.2. Діапазони: tempo [120,140], popularity >= 60, duration_sec [180,240]
+========================================================
+Кількість: 1741
+[
+  {
+    track_name: 'Quevedo: Bzrp Music Sessions, Vol. 52',
+    popularity: 99,
+    artists: [
+      'Bizarrap',
+      'Quevedo'
+    ],
+    audio_features: {
+      tempo: 128.033
+    },
+    duration_sec: 198.9
+  },
+  {
+    track_name: 'Ferrari',
+    popularity: 90,
+    artists: [
+      'James Hype',
+      'Miggy Dela Rosa'
+    ],
+    audio_features: {
+      tempo: 125.004
+    },
+    duration_sec: 186.7
+  },
+  {
+    track_name: 'Ferrari',
+    popularity: 90,
+    artists: [
+      'James Hype',
+      'Miggy Dela Rosa'
+    ],
+    audio_features: {
+      tempo: 125.004
+    },
+    duration_sec: 186.7
+  }
+]
+
+========================================================
+2.3. Масиви: усі треки за участю Bad Bunny
+========================================================
+Кількість: 416
+[
+  {
+    track_name: 'Tití Me Preguntó',
+    popularity: 97,
+    artists: [
+      'Bad Bunny'
+    ]
+  },
+  {
+    track_name: 'Tití Me Preguntó',
+    popularity: 97,
+    artists: [
+      'Bad Bunny'
+    ]
+  },
+  {
+    track_name: 'Me Porto Bonito',
+    popularity: 97,
+    artists: [
+      'Bad Bunny',
+      'Chencho Corleone'
+    ]
+  }
+]
+
+========================================================
+2.4. $all: Daddy Yankee ТА Bad Bunny в одному треку
+========================================================
+Кількість: 88
+[
+  {
+    track_name: 'X ÚLTIMA VEZ',
+    track_genre: 'hip-hop',
+    artists: [
+      'Daddy Yankee',
+      'Bad Bunny'
+    ]
+  },
+  {
+    track_name: 'X ÚLTIMA VEZ',
+    track_genre: 'hip-hop',
+    artists: [
+      'Daddy Yankee',
+      'Bad Bunny'
+    ]
+  },
+  {
+    track_name: 'Vuelve',
+    track_genre: 'hip-hop',
+    artists: [
+      'Daddy Yankee',
+      'Bad Bunny'
+    ]
+  }
+]
+
+========================================================
+2.5. $size: сольні треки (artists розміром 1)
+========================================================
+Кількість: 83924
+З 3+ виконавцями: 8963
+[
+  {
+    track_name: 'The Scientist',
+    artists: [
+      'Tyler Ward',
+      'Lindsey Stirling',
+      'Kina Grannis'
+    ]
+  },
+  {
+    track_name: 'Love Story',
+    artists: [
+      'Tyler Ward',
+      'Karis',
+      'Ray Lorraine'
+    ]
+  }
+]
+
+========================================================
+2.6. $in: треки Bruno Mars або Silk Sonic
+========================================================
+Кількість: 90
+[
+  {
+    track_name: 'Locked out of Heaven',
+    popularity: 87,
+    artists: [
+      'Bruno Mars'
+    ]
+  },
+  {
+    track_name: 'Leave The Door Open',
+    popularity: 84,
+    artists: [
+      'Bruno Mars',
+      'Anderson .Paak',
+      'Silk Sonic'
+    ]
+  },
+  {
+    track_name: 'Uptown Funk (feat. Bruno Mars)',
+    popularity: 83,
+    artists: [
+      'Mark Ronson',
+      'Bruno Mars'
+    ]
+  }
+]
+
+========================================================
+2.7. $or: (explicit AND popularity>=70) OR instrumentalness>0.5
+========================================================
+Кількість: 19727
+[
+  {
+    track_name: 'And I Love Her',
+    popularity: 66,
+    explicit: false,
+    artists: [
+      'Kurt Cobain'
+    ],
+    audio_features: {
+      instrumentalness: 0.833
+    }
+  },
+  {
+    track_name: 'Chi Mai',
+    popularity: 40,
+    explicit: false,
+    artists: [
+      'Joseph Sullinger'
+    ],
+    audio_features: {
+      instrumentalness: 0.961
+    }
+  },
+  {
+    track_name: 'Mujer con Abanico',
+    popularity: 41,
+    explicit: false,
+    artists: [
+      'Agustín Amigó',
+      'Nylonwings'
+    ],
+    audio_features: {
+      instrumentalness: 0.905
+    }
+  }
+]
+
+========================================================
+2.8. $regex: назва починається з 'love', valence > 0.7
+========================================================
+Кількість: 143
+[
+  {
+    track_name: 'Love You Like A Love Song',
+    popularity: 81,
+    artists: [
+      'Selena Gomez & The Scene'
+    ],
+    audio_features: {
+      valence: 0.922
+    }
+  },
+  {
+    track_name: 'Lovely Day',
+    popularity: 76,
+    artists: [
+      'Bill Withers'
+    ],
+    audio_features: {
+      valence: 0.706
+    }
+  },
+  {
+    track_name: 'Lovely Day',
+    popularity: 76,
+    artists: [
+      'Bill Withers'
+    ],
+    audio_features: {
+      valence: 0.706
+    }
+  }
+]
+
+========================================================
+2.9. tier='high', explicit != true, жанр не з [pop, k-pop]
+========================================================
+Кількість: 4103
+[
+  {
+    track_name: 'Unholy (feat. Kim Petras)',
+    popularity: 100,
+    track_genre: 'dance',
+    artists: [
+      'Sam Smith',
+      'Kim Petras'
+    ]
+  },
+  {
+    track_name: 'Quevedo: Bzrp Music Sessions, Vol. 52',
+    popularity: 99,
+    track_genre: 'hip-hop',
+    artists: [
+      'Bizarrap',
+      'Quevedo'
+    ]
+  },
+  {
+    track_name: 'La Bachata',
+    popularity: 98,
+    track_genre: 'latin',
+    artists: [
+      'Manuel Turizo'
+    ]
+  }
+]
+
+Усі запити частини 2 виконано.

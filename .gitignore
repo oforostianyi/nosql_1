@@ -1,0 +1,20 @@
+# Секрети — не комітити!
+.env
+atlas-credentials.env
+credentials.txt
+*.env
+
+# Дані
+dataset.csv
+*.csv
+
+# Python
+.venv/
+__pycache__/
+*.pyc
+
+# Node
+node_modules/
+
+# Системне
+.DS_Store
