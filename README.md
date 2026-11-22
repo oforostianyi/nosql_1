@@ -34,6 +34,11 @@ pip install -r requirements.txt
 # 2. .env — рядок підключення до Atlas (файл у .gitignore)
 # MONGO_URI=mongodb+srv://user:password@cluster.mongodb.net/
 
+# ВАЖЛИВО: експортуйте змінну в шел перед запуском mongosh,
+# інакше "$MONGO_URI" порожній і mongosh піде на localhost:27017 (ECONNREFUSED)
+export $(grep -m1 '^MONGO_URI=' .env)
+echo ${#MONGO_URI}   # sanity check: має бути > 0
+
 # 3. Датасет dataset.csv у корінь проєкту
 #    Kaggle: https://www.kaggle.com/datasets/maharshipandya/-spotify-tracks-dataset
 #    (використано публічне дзеркало HuggingFace: maharshipandya/spotify-tracks-dataset)
