@@ -23,9 +23,9 @@
 
 --- explain() БЕЗ індексу:
 {
-  label: 'task1 before',
+  label: 'завдання 1: до індексу',
   stages: 'SORT → COLLSCAN',
-  executionTimeMillis: 72,
+  executionTimeMillis: 71,
   totalKeysExamined: 0,
   totalDocsExamined: 113999,
   nReturned: 354
@@ -42,7 +42,7 @@
 
 --- explain() ПІСЛЯ індексу:
 {
-  label: 'task1 after',
+  label: 'завдання 1: після індексу',
   stages: 'FETCH → IXSCAN',
   executionTimeMillis: 2,
   totalKeysExamined: 412,
@@ -52,7 +52,7 @@
 
 --- Порівняння:
   stages:        SORT → COLLSCAN  →  FETCH → IXSCAN
-  час (мс):      72  →  2
+  час (мс):      71  →  2
   docsExamined:  113999  →  354
   keysExamined:  0  →  412
   nReturned:     354  →  354
@@ -75,9 +75,9 @@
 
 --- explain() БЕЗ індексу:
 {
-  label: 'task2 before',
+  label: 'завдання 2: до індексу',
   stages: 'COLLSCAN',
-  executionTimeMillis: 124,
+  executionTimeMillis: 125,
   totalKeysExamined: 0,
   totalDocsExamined: 113999,
   nReturned: 16141
@@ -94,7 +94,7 @@
 
 --- explain() ПІСЛЯ індексу:
 {
-  label: 'task2 after',
+  label: 'завдання 2: після індексу',
   stages: 'FETCH → IXSCAN',
   executionTimeMillis: 37,
   totalKeysExamined: 16602,
@@ -104,7 +104,7 @@
 
 --- Порівняння:
   stages:        COLLSCAN  →  FETCH → IXSCAN
-  час (мс):      124  →  37
+  час (мс):      125  →  37
   docsExamined:  113999  →  16141
   keysExamined:  0  →  16602
   nReturned:     16141  →  16141
@@ -123,7 +123,7 @@
 
 )
 {
-  label: 'task3 without projection',
+  label: 'завдання 3: без проєкції',
   stages: 'FETCH → IXSCAN',
   executionTimeMillis: 0,
   totalKeysExamined: 317,
@@ -147,7 +147,7 @@
 }
 )
 {
-  label: 'task3 covered projection',
+  label: 'завдання 3: покривна проєкція',
   stages: 'PROJECTION_COVERED → IXSCAN',
   executionTimeMillis: 0,
   totalKeysExamined: 317,
@@ -170,9 +170,9 @@
 
 --- explain() БЕЗ індексу:
 {
-  label: 'bonus before',
+  label: 'бонус: до індексу',
   stages: 'COLLSCAN',
-  executionTimeMillis: 82,
+  executionTimeMillis: 81,
   totalKeysExamined: 0,
   totalDocsExamined: 113999,
   nReturned: 416
@@ -183,7 +183,7 @@
 
 --- explain() ПІСЛЯ індексу:
 {
-  label: 'bonus after',
+  label: 'бонус: після індексу',
   stages: 'FETCH → IXSCAN',
   executionTimeMillis: 2,
   totalKeysExamined: 416,
@@ -193,7 +193,7 @@
 
 --- Порівняння:
   stages:        COLLSCAN  →  FETCH → IXSCAN
-  час (мс):      82  →  2
+  час (мс):      81  →  2
   docsExamined:  113999  →  416
 
 ========================================================

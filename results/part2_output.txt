@@ -1,4 +1,3 @@
-
 ========================================================
 Завдання 1. Треки для вечірки: danceability>0.7, energy>0.7, 3–5 хв
 ========================================================
@@ -101,7 +100,7 @@ db.tracks.find(
 ]
 
 ========================================================
-Завдання 2. Топ-20 виконавців: >=3 треків і min(popularity) >= 60
+Завдання 2. Топ-20 виконавців: >=3 унікальних треків і min(popularity) >= 60
 ========================================================
 >>> ЗАПИТ:
 db.tracks.aggregate(
@@ -111,7 +110,18 @@ db.tracks.aggregate(
   },
   {
     '$group': {
-      _id: '$artists',
+      _id: {
+        artist: '$artists',
+        track_id: '$track_id'
+      },
+      popularity: {
+        '$max': '$popularity'
+      }
+    }
+  },
+  {
+    '$group': {
+      _id: '$_id.artist',
       track_count: {
         '$sum': 1
       },
@@ -169,40 +179,16 @@ db.tracks.aggregate(
     avg_popularity: 92
   },
   {
-    track_count: 4,
-    min_popularity: 90,
-    artist: 'Luar La L',
-    avg_popularity: 90.5
-  },
-  {
     track_count: 5,
     min_popularity: 86,
     artist: 'Olivia Rodrigo',
     avg_popularity: 87.4
   },
   {
-    track_count: 4,
-    min_popularity: 87,
-    artist: 'BYOR',
-    avg_popularity: 87
-  },
-  {
     track_count: 3,
     min_popularity: 79,
     artist: 'IVE',
     avg_popularity: 84
-  },
-  {
-    track_count: 12,
-    min_popularity: 76,
-    artist: 'Måneskin',
-    avg_popularity: 83.7
-  },
-  {
-    track_count: 11,
-    min_popularity: 77,
-    artist: 'Lil Nas X',
-    avg_popularity: 83.5
   },
   {
     track_count: 3,
@@ -217,28 +203,28 @@ db.tracks.aggregate(
     avg_popularity: 83
   },
   {
-    track_count: 5,
-    min_popularity: 80,
-    artist: 'TV Girl',
-    avg_popularity: 82
+    track_count: 8,
+    min_popularity: 77,
+    artist: 'Lil Nas X',
+    avg_popularity: 82.8
   },
   {
-    track_count: 4,
-    min_popularity: 81,
-    artist: 'Mac DeMarco',
-    avg_popularity: 81.5
+    track_count: 5,
+    min_popularity: 76,
+    artist: 'Måneskin',
+    avg_popularity: 82.6
   },
   {
     track_count: 3,
-    min_popularity: 81,
-    artist: 'Cults',
-    avg_popularity: 81.3
+    min_popularity: 80,
+    artist: 'TV Girl',
+    avg_popularity: 81.7
   },
   {
-    track_count: 4,
-    min_popularity: 79,
-    artist: 'Ricky Montgomery',
-    avg_popularity: 80.5
+    track_count: 6,
+    min_popularity: 69,
+    artist: 'Mora',
+    avg_popularity: 80.3
   },
   {
     track_count: 3,
@@ -248,39 +234,63 @@ db.tracks.aggregate(
   },
   {
     track_count: 3,
-    min_popularity: 80,
-    artist: 'Declan McKenna',
-    avg_popularity: 80
-  },
-  {
-    track_count: 3,
-    min_popularity: 80,
-    artist: 'Joy Again',
-    avg_popularity: 80
-  },
-  {
-    track_count: 7,
-    min_popularity: 69,
-    artist: 'Mora',
-    avg_popularity: 79.7
-  },
-  {
-    track_count: 3,
     min_popularity: 70,
     artist: 'Maroon 5',
     avg_popularity: 79.7
   },
   {
-    track_count: 7,
-    min_popularity: 73,
-    artist: 'Beach Bunny',
-    avg_popularity: 79.4
+    track_count: 6,
+    min_popularity: 75,
+    artist: 'Mitski',
+    avg_popularity: 78.3
   },
   {
     track_count: 3,
-    min_popularity: 79,
-    artist: "Gigi D'Agostino",
-    avg_popularity: 79
+    min_popularity: 74,
+    artist: 'Mark Ronson',
+    avg_popularity: 78.3
+  },
+  {
+    track_count: 4,
+    min_popularity: 75,
+    artist: 'LE SSERAFIM',
+    avg_popularity: 78
+  },
+  {
+    track_count: 3,
+    min_popularity: 73,
+    artist: 'Beach Bunny',
+    avg_popularity: 78
+  },
+  {
+    track_count: 5,
+    min_popularity: 69,
+    artist: 'Shubh',
+    avg_popularity: 77.8
+  },
+  {
+    track_count: 4,
+    min_popularity: 65,
+    artist: 'SZA',
+    avg_popularity: 77.8
+  },
+  {
+    track_count: 3,
+    min_popularity: 75,
+    artist: 'Jhay Cortez',
+    avg_popularity: 77.7
+  },
+  {
+    track_count: 3,
+    min_popularity: 76,
+    artist: 'Mother Mother',
+    avg_popularity: 77.3
+  },
+  {
+    track_count: 4,
+    min_popularity: 72,
+    artist: 'Tiago PZK',
+    avg_popularity: 77
   }
 ]
 
@@ -1717,15 +1727,17 @@ db.tracks.find(
     }
   },
   {
-    track_name: 'Show Me How',
+    track_name: 'Experience',
     explicit: false,
     artists: [
-      'Men I Trust'
+      'Ludovico Einaudi',
+      'Daniel Hope',
+      'I Virtuosi Italiani'
     ],
     audio_features: {
-      loudness: -11.997,
-      speechiness: 0.0415,
-      instrumentalness: 0.534
+      loudness: -10.634,
+      speechiness: 0.0376,
+      instrumentalness: 0.961
     }
   },
   {

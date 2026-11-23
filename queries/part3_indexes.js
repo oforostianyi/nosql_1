@@ -71,7 +71,7 @@ const q1sort = { popularity: -1 };
 printQuery(q1filter, q1sort);
 
 print("\n--- explain() БЕЗ індексу:");
-const t1before = profileFind(q1filter, q1sort, null, "task1 before");
+const t1before = profileFind(q1filter, q1sort, null, "завдання 1: до індексу");
 printjson(t1before);
 
 print("\n>>> ЗАПИТ: db.tracks.createIndex(");
@@ -81,7 +81,7 @@ print(', { name: "idx_genre_pop_dance" })');
 print("Створено: " + db.tracks.createIndex(idx1, { name: "idx_genre_pop_dance" }));
 
 print("\n--- explain() ПІСЛЯ індексу:");
-const t1after = profileFind(q1filter, q1sort, null, "task1 after");
+const t1after = profileFind(q1filter, q1sort, null, "завдання 1: після індексу");
 printjson(t1after);
 
 print("\n--- Порівняння:");
@@ -106,7 +106,7 @@ const q2filter = {
 printQuery(q2filter);
 
 print("\n--- explain() БЕЗ індексу:");
-const t2before = profileFind(q2filter, null, null, "task2 before");
+const t2before = profileFind(q2filter, null, null, "завдання 2: до індексу");
 printjson(t2before);
 
 print("\n>>> ЗАПИТ: db.tracks.createIndex(");
@@ -120,7 +120,7 @@ print(', { name: "idx_work_music" })');
 print("Створено: " + db.tracks.createIndex(idx2, { name: "idx_work_music" }));
 
 print("\n--- explain() ПІСЛЯ індексу:");
-const t2after = profileFind(q2filter, null, null, "task2 after");
+const t2after = profileFind(q2filter, null, null, "завдання 2: після індексу");
 printjson(t2after);
 
 print("\n--- Порівняння:");
@@ -141,13 +141,13 @@ const q3filter = { track_genre: "pop", popularity: { $gte: 70 } };
 
 print("Варіант А — як у умові, БЕЗ проєкції (повертається весь документ):");
 printQuery(q3filter);
-const t3a = profileFind(q3filter, null, null, "task3 without projection");
+const t3a = profileFind(q3filter, null, null, "завдання 3: без проєкції");
 printjson(t3a);
 
 print("\nВаріант Б — проєкція лише полів індексу, _id виключено:");
 const q3proj = { _id: 0, track_genre: 1, popularity: 1 };
 printQuery(q3filter, null, q3proj);
-const t3b = profileFind(q3filter, null, q3proj, "task3 covered projection");
+const t3b = profileFind(q3filter, null, q3proj, "завдання 3: покривна проєкція");
 printjson(t3b);
 
 print("\nВисновок: без проєкції — NOT covered (FETCH, docsExamined=" + t3a.totalDocsExamined + ");");
@@ -161,14 +161,14 @@ header("Бонус. Multikey: artists='Bad Bunny'");
 const q4filter = { artists: "Bad Bunny" };
 printQuery(q4filter);
 
-const t4before = profileFind(q4filter, null, null, "bonus before");
+const t4before = profileFind(q4filter, null, null, "бонус: до індексу");
 print("\n--- explain() БЕЗ індексу:");
 printjson(t4before);
 
 print("\n>>> ЗАПИТ: db.tracks.createIndex({ artists: 1 }, { name: 'idx_artists_multikey' })");
 print("Створено: " + db.tracks.createIndex({ artists: 1 }, { name: "idx_artists_multikey" }));
 
-const t4after = profileFind(q4filter, null, null, "bonus after");
+const t4after = profileFind(q4filter, null, null, "бонус: після індексу");
 print("\n--- explain() ПІСЛЯ індексу:");
 printjson(t4after);
 
