@@ -5,7 +5,7 @@
 Індекси tracks: ["_id_"]
 
 ========================================================
-Завдання 1. genre='pop' + danceability>=0.7, sort popularity desc
+Завдання 1. Жанр pop, танцювальність від 0.7, сортування за популярністю
 ========================================================
 >>> ЗАПИТ: db.tracks.find(
 {
@@ -25,7 +25,7 @@
 {
   label: 'завдання 1: до індексу',
   stages: 'SORT → COLLSCAN',
-  executionTimeMillis: 71,
+  executionTimeMillis: 121,
   totalKeysExamined: 0,
   totalDocsExamined: 113999,
   nReturned: 354
@@ -52,13 +52,13 @@
 
 --- Порівняння:
   stages:        SORT → COLLSCAN  →  FETCH → IXSCAN
-  час (мс):      71  →  2
+  час (мс):      121  →  2
   docsExamined:  113999  →  354
   keysExamined:  0  →  412
   nReturned:     354  →  354
 
 ========================================================
-Завдання 2. Індекс для work-music: explicit + instrumentalness + speechiness
+Завдання 2. Індекс для музики під час роботи: explicit, instrumentalness, speechiness
 ========================================================
 >>> ЗАПИТ: db.tracks.find(
 {
@@ -77,7 +77,7 @@
 {
   label: 'завдання 2: до індексу',
   stages: 'COLLSCAN',
-  executionTimeMillis: 125,
+  executionTimeMillis: 122,
   totalKeysExamined: 0,
   totalDocsExamined: 113999,
   nReturned: 16141
@@ -96,7 +96,7 @@
 {
   label: 'завдання 2: після індексу',
   stages: 'FETCH → IXSCAN',
-  executionTimeMillis: 37,
+  executionTimeMillis: 35,
   totalKeysExamined: 16602,
   totalDocsExamined: 16141,
   nReturned: 16141
@@ -104,7 +104,7 @@
 
 --- Порівняння:
   stages:        COLLSCAN  →  FETCH → IXSCAN
-  час (мс):      125  →  37
+  час (мс):      122  →  35
   docsExamined:  113999  →  16141
   keysExamined:  0  →  16602
   nReturned:     16141  →  16141
@@ -112,7 +112,7 @@
 ========================================================
 Завдання 3. Чи є запит покривним (covered query)?
 ========================================================
-Варіант А — як у умові, БЕЗ проєкції (повертається весь документ):
+Варіант А: як в умові, без переліку полів (база повертає весь запис):
 >>> ЗАПИТ: db.tracks.find(
 {
   track_genre: 'pop',
@@ -131,7 +131,7 @@
   nReturned: 317
 }
 
-Варіант Б — проєкція лише полів індексу, _id виключено:
+Варіант Б: повертаємо лише поля з індексу і не повертаємо _id:
 >>> ЗАПИТ: db.tracks.find(
 {
   track_genre: 'pop',
@@ -155,11 +155,11 @@
   nReturned: 317
 }
 
-Висновок: без проєкції — NOT covered (FETCH, docsExamined=317);
-з проєкцією {_id:0, track_genre:1, popularity:1} — covered (PROJECTION_COVERED, docsExamined=0).
+Висновок: варіант А не покривний (є стадія FETCH, прочитано записів: 317).
+Варіант Б покривний (стадія PROJECTION_COVERED, прочитано записів: 0).
 
 ========================================================
-Бонус. Multikey: artists='Bad Bunny'
+Додатково. Індекс за списком виконавців (multikey), пошук Bad Bunny
 ========================================================
 >>> ЗАПИТ: db.tracks.find(
 {
@@ -172,7 +172,7 @@
 {
   label: 'бонус: до індексу',
   stages: 'COLLSCAN',
-  executionTimeMillis: 81,
+  executionTimeMillis: 82,
   totalKeysExamined: 0,
   totalDocsExamined: 113999,
   nReturned: 416
@@ -193,7 +193,7 @@
 
 --- Порівняння:
   stages:        COLLSCAN  →  FETCH → IXSCAN
-  час (мс):      81  →  2
+  час (мс):      82  →  2
   docsExamined:  113999  →  416
 
 ========================================================

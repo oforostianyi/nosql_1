@@ -64,7 +64,7 @@ print("Індекси tracks: " + JSON.stringify(db.tracks.getIndexes().map(i =>
 // Індекс за правилом ESR: Equality → Sort → Range:
 //   { track_genre: 1, popularity: -1, "audio_features.danceability": 1 }
 // ========================================================
-header("Завдання 1. genre='pop' + danceability>=0.7, sort popularity desc");
+header("Завдання 1. Жанр pop, танцювальність від 0.7, сортування за популярністю");
 
 const q1filter = { track_genre: "pop", "audio_features.danceability": { $gte: 0.7 } };
 const q1sort = { popularity: -1 };
@@ -96,7 +96,7 @@ print("  nReturned:     " + t1before.nReturned + "  →  " + t1after.nReturned);
 // explicit (рівність) + instrumentalness (діапазон) + speechiness (діапазон).
 // Порядок полів: рівність першою (ESR), далі найбільш селективний діапазон.
 // ========================================================
-header("Завдання 2. Індекс для work-music: explicit + instrumentalness + speechiness");
+header("Завдання 2. Індекс для музики під час роботи: explicit, instrumentalness, speechiness");
 
 const q2filter = {
   explicit: false,
@@ -139,24 +139,24 @@ header("Завдання 3. Чи є запит покривним (covered query
 
 const q3filter = { track_genre: "pop", popularity: { $gte: 70 } };
 
-print("Варіант А — як у умові, БЕЗ проєкції (повертається весь документ):");
+print("Варіант А: як в умові, без переліку полів (база повертає весь запис):");
 printQuery(q3filter);
 const t3a = profileFind(q3filter, null, null, "завдання 3: без проєкції");
 printjson(t3a);
 
-print("\nВаріант Б — проєкція лише полів індексу, _id виключено:");
+print("\nВаріант Б: повертаємо лише поля з індексу і не повертаємо _id:");
 const q3proj = { _id: 0, track_genre: 1, popularity: 1 };
 printQuery(q3filter, null, q3proj);
 const t3b = profileFind(q3filter, null, q3proj, "завдання 3: покривна проєкція");
 printjson(t3b);
 
-print("\nВисновок: без проєкції — NOT covered (FETCH, docsExamined=" + t3a.totalDocsExamined + ");");
-print("з проєкцією {_id:0, track_genre:1, popularity:1} — covered (PROJECTION_COVERED, docsExamined=" + t3b.totalDocsExamined + ").");
+print("\nВисновок: варіант А не покривний (є стадія FETCH, прочитано записів: " + t3a.totalDocsExamined + ").");
+print("Варіант Б покривний (стадія PROJECTION_COVERED, прочитано записів: " + t3b.totalDocsExamined + ").");
 
 // ========================================================
 // Бонус. Multikey-індекс по масиву artists
 // ========================================================
-header("Бонус. Multikey: artists='Bad Bunny'");
+header("Додатково. Індекс за списком виконавців (multikey), пошук Bad Bunny");
 
 const q4filter = { artists: "Bad Bunny" };
 printQuery(q4filter);
